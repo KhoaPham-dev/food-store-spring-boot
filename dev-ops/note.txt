@@ -1,0 +1,12 @@
+* URL env:
+
+* Swagger:
+	https://ilearning-api.developteam.net/swagger-ui.html
+
+* Mysql: 
+
+CREATE DATABASE db_ilearning CHARACTER SET utf8;
+CREATE USER 'ilearning_user' IDENTIFIED BY 'ilearning_user@123';
+CREATE USER 'ilearning_user'@'localhost' IDENTIFIED BY 'ilearning_user@123';
+GRANT ALL PRIVILEGES ON db_ilearning.* TO 'ilearning_user';
+FLUSH PRIVILEGES;
