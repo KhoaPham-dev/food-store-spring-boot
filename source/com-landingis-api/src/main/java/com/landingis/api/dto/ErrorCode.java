@@ -50,5 +50,11 @@ public class ErrorCode {
     public static final String ACCOUNT_ERROR_UNAUTHORIZED = "ERROR-ACCOUNT-000";
     public static final String ACCOUNT_ERROR_NOT_FOUND = "ERROR-ACCOUNT-001";
 
+    /**
+     * Employee error code
+     */
+    public static final String EMPLOYEE_ERROR_UNAUTHORIZED = "ERROR-EMPLOYEE-000";
+    public static final String EMPLOYEE_ERROR_NOT_FOUND = "ERROR-EMPLOYEE-001";
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }
