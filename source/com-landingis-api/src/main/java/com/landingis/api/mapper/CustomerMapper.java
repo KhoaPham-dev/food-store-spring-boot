@@ -12,10 +12,7 @@ import java.util.List;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CustomerMapper {
 
-    @Mapping(source = "kind", target = "account.kind")
-    @Mapping(source = "username", target = "account.username")
     @Mapping(source = "email", target = "account.email")
-    @Mapping(source = "password", target = "account.password")
     @Mapping(source = "avatarPath", target = "account.avatarPath")
     @Mapping(source = "phone", target = "account.phone")
     @Mapping(source = "fullName", target = "account.fullName")
@@ -28,9 +25,7 @@ public interface CustomerMapper {
     @Named("adminCreateMapping")
     Customer fromCreateCustomerFormToEntity(CreateCustomerForm createCustomerForm);
 
-    @Mapping(source = "username", target = "account.username")
     @Mapping(source = "email", target = "account.email")
-    @Mapping(source = "password", target = "account.password")
     @Mapping(source = "avatarPath", target = "account.avatarPath")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "fullName", target = "account.fullName")
@@ -43,6 +38,11 @@ public interface CustomerMapper {
     @Named("adminUpdateMapping")
     void fromUpdateCustomerFormToEntity(UpdateCustomerForm updateCustomerForm, @MappingTarget Customer customer);
 
+    @Mapping(source = "account.kind", target = "kind")
+    @Mapping(source = "account.email", target = "email")
+    @Mapping(source = "account.avatarPath", target = "avatarPath")
+    @Mapping(source = "account.fullName", target = "fullName")
+    @Mapping(source = "account.phone", target = "phone")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "address", target = "address")

@@ -11,19 +11,15 @@ import java.util.Date;
 
 @Data
 public class UpdateCustomerForm {
-    @NotEmpty(message = "username cannot be null")
-    @ApiModelProperty(required = true)
-    private String username;
-
     @ApiModelProperty(required = true)
     @Email
     private String email;
 
+    private String avatarPath;
+
     @NotEmpty(message = "password cannot be null")
     @ApiModelProperty(required = true)
     private String password;
-
-    private String avatarPath;
 
     @NotNull(message = "id cannot be null")
     @ApiModelProperty(required = true)

@@ -15,4 +15,10 @@ public class CustomerDto extends ABasicAdminDto {
     private Integer sex;
     private String note;
     private Integer status;
+    private Integer kind;
+    private String email;
+    private String avatarPath;
+    private String fullName;
+    private String phone;
+    private String password;
 }

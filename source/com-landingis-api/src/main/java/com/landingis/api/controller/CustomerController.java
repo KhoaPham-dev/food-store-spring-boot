@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,7 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Slf4j
 public class CustomerController extends ABasicController{
+    PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     @Autowired
     CustomerRepository customerRepository;
 
@@ -95,19 +98,18 @@ public class CustomerController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Long accountCheck = accountRepository
-                .countAccountByUsername(createCustomerForm.getUsername());
+                .countAccountByUsername(createCustomerForm.getPhone());
         if (accountCheck > 0) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Username is existed");
+            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is existed");
         }
-        Integer groupKind = LandingISConstant.GROUP_KIND_EMPLOYEE;
-        if(createCustomerForm.getKind().equals(LandingISConstant.USER_KIND_ADMIN)) {
-            groupKind = LandingISConstant.GROUP_KIND_SUPER_ADMIN;
-        }
+        Integer groupKind = LandingISConstant.GROUP_KIND_CUSTOMER;
         Group group = groupRepository.findFirstByKind(groupKind);
         if (group == null) {
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Group does not exist!");
         }
         Customer customer = customerMapper.fromCreateCustomerFormToEntity(createCustomerForm);
+        customer.getAccount().setGroup(group);
+        customer.getAccount().setPassword(passwordEncoder.encode(createCustomerForm.getPassword()));
         customerRepository.save(customer);
         apiMessageDto.setMessage("Create customer success");
         return apiMessageDto;
@@ -123,7 +125,19 @@ public class CustomerController extends ABasicController{
         if(customer == null) {
             throw new RequestException(ErrorCode.CUSTOMER_ERROR_NOT_FOUND, "Not found customer.");
         }
+
         customerMapper.fromUpdateCustomerFormToEntity(updateCustomerForm, customer);
+        if (StringUtils.isNoneBlank(updateCustomerForm.getPassword())) {
+            customer.getAccount().setPassword(passwordEncoder.encode(updateCustomerForm.getPassword()));
+        }
+        customer.getAccount().setFullName(updateCustomerForm.getFullName());
+        if (StringUtils.isNoneBlank(updateCustomerForm.getAvatarPath())) {
+            if(!updateCustomerForm.getAvatarPath().equals(customer.getAccount().getAvatarPath())){
+                //delete old image
+                landingIsApiService.deleteFile(customer.getAccount().getAvatarPath());
+            }
+            customer.getAccount().setAvatarPath(updateCustomerForm.getAvatarPath());
+        }
         customerRepository.save(customer);
         apiMessageDto.setMessage("Update customer success");
         return apiMessageDto;
@@ -140,6 +154,7 @@ public class CustomerController extends ABasicController{
         if(customer == null) {
             throw new RequestException(ErrorCode.CUSTOMER_ERROR_NOT_FOUND, "Not found customer");
         }
+        landingIsApiService.deleteFile(customer.getAccount().getAvatarPath());
         customerRepository.delete(customer);
         result.setMessage("Delete customer success");
         return result;
