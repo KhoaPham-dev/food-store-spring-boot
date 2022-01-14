@@ -10,8 +10,10 @@ import org.mapstruct.*;
 
 import java.util.List;
 
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AccountMapper {
+
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "email", target = "email")
@@ -19,6 +21,7 @@ public interface AccountMapper {
     @Mapping(source = "avatarPath", target = "avatarPath")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "phone", target = "phone")
+    @BeanMapping(ignoreByDefault = true)
     Account fromCreateAccountAdminFormToAdmin(CreateAccountAdminForm createAccountAdminForm);
 
 
@@ -41,6 +44,7 @@ public interface AccountMapper {
     @Mapping(source = "avatarPath", target = "avatar")
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "isSuperAdmin", target = "isSuperAdmin")
+    @BeanMapping(ignoreByDefault = true)
     AccountDto fromEntityToAccountDto(Account account);
 
 

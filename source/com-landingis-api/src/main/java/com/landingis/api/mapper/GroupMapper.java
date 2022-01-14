@@ -6,10 +6,7 @@ import com.landingis.api.dto.group.GroupAdminDto;
 import com.landingis.api.dto.group.GroupDto;
 import com.landingis.api.storage.model.Group;
 
-import org.mapstruct.IterableMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GroupMapper {
@@ -19,6 +16,7 @@ public interface GroupMapper {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "kind", target = "kind")
     @Mapping(source = "permissions", target = "permissions")
+    @BeanMapping(ignoreByDefault = true)
     GroupDto fromEntityToGroupDto(Group group);
 
     @Mapping(source = "id", target = "id")
@@ -26,6 +24,7 @@ public interface GroupMapper {
     @Mapping(source = "description", target = "description")
     @Mapping(source = "kind", target = "kind")
     @Mapping(source = "permissions", target = "permissions")
+    @BeanMapping(ignoreByDefault = true)
     GroupAdminDto fromEntityToGroupAdminDto(Group group);
 
     @IterableMapping(elementTargetType = GroupAdminDto.class)

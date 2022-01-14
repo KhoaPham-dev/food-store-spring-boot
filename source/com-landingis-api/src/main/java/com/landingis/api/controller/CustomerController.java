@@ -98,7 +98,7 @@ public class CustomerController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Long accountCheck = accountRepository
-                .countAccountByUsername(createCustomerForm.getPhone());
+                .countAccountByPhone(createCustomerForm.getPhone());
         if (accountCheck > 0) {
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is existed");
         }
@@ -109,6 +109,7 @@ public class CustomerController extends ABasicController{
         }
         Customer customer = customerMapper.fromCreateCustomerFormToEntity(createCustomerForm);
         customer.getAccount().setGroup(group);
+        customer.getAccount().setKind(LandingISConstant.USER_KIND_CUSTOMER);
         customer.getAccount().setPassword(passwordEncoder.encode(createCustomerForm.getPassword()));
         customerRepository.save(customer);
         apiMessageDto.setMessage("Create customer success");

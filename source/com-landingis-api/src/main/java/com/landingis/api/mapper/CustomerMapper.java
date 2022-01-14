@@ -25,11 +25,9 @@ public interface CustomerMapper {
     @Named("adminCreateMapping")
     Customer fromCreateCustomerFormToEntity(CreateCustomerForm createCustomerForm);
 
-    @Mapping(source = "email", target = "account.email")
     @Mapping(source = "avatarPath", target = "account.avatarPath")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "fullName", target = "account.fullName")
-    @Mapping(source = "phone", target = "account.phone")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "birthDay", target = "birthday")
     @Mapping(source = "note", target = "note")
@@ -44,7 +42,6 @@ public interface CustomerMapper {
     @Mapping(source = "account.fullName", target = "fullName")
     @Mapping(source = "account.phone", target = "phone")
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "account.id", target = "accountId")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "birthday", target = "birthDay")
     @Mapping(source = "note", target = "note")

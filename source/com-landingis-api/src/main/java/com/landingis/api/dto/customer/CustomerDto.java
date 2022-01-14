@@ -9,7 +9,6 @@ import java.util.Date;
 public class CustomerDto extends ABasicAdminDto {
 
     private Long id;
-    private Long accountId;
     private String address;
     private Date birthDay;
     private Integer sex;
@@ -20,5 +19,4 @@ public class CustomerDto extends ABasicAdminDto {
     private String avatarPath;
     private String fullName;
     private String phone;
-    private String password;
 }
