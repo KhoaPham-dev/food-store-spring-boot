@@ -37,11 +37,11 @@ public class CustomerCriteria {
                 }
                 if(getPhone() != null) {
                     Join<Account, Customer> joinAccount = root.join("account", JoinType.INNER);
-                    predicates.add(cb.equal(joinAccount.get("phone"), getPhone()));
+                    predicates.add(cb.like(cb.lower(joinAccount.get("phone")), "%" + getPhone().toLowerCase() + "%"));
                 }
                 if(getFullName() != null) {
                     Join<Account, Customer> joinAccount = root.join("account", JoinType.INNER);
-                    predicates.add(cb.equal(joinAccount.get("fullName"), getFullName()));
+                    predicates.add(cb.like(cb.lower(joinAccount.get("fullName")), "%" + getFullName().toLowerCase() + "%"));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
