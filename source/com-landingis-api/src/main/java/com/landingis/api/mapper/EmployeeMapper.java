@@ -15,6 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EmployeeMapper {
+    @Mapping(source = "username", target = "account.username")
     @Mapping(source = "email", target = "account.email")
     @Mapping(source = "avatarPath", target = "account.avatarPath")
     @Mapping(source = "phone", target = "account.phone")
@@ -36,6 +37,7 @@ public interface EmployeeMapper {
     @Named("adminCreateMapping")
     Employee fromCreateEmployeeFormToEntity(CreateEmployeeForm createEmployeeForm);
 
+    @Mapping(source = "username", target = "account.username")
     @Mapping(source = "avatarPath", target = "account.avatarPath")
     @Mapping(source = "id", target = "id")
     @Mapping(source = "fullName", target = "account.fullName")
@@ -55,6 +57,7 @@ public interface EmployeeMapper {
     @Named("adminUpdateMapping")
     void fromUpdateEmployeeFormToEntity(UpdateEmployeeForm updateEmployeeForm, @MappingTarget Employee employee);
 
+    @Mapping(source = "account.username", target = "username")
     @Mapping(source = "account.kind", target = "kind")
     @Mapping(source = "account.email", target = "email")
     @Mapping(source = "account.avatarPath", target = "avatarPath")

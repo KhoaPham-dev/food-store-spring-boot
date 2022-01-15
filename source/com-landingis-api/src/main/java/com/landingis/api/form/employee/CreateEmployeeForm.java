@@ -25,6 +25,10 @@ public class CreateEmployeeForm {
     @ApiModelProperty(required = true)
     private String password;
 
+    @NotEmpty(message = "username cannot be null")
+    @ApiModelProperty(required = true)
+    private String username;
+
     @NotEmpty(message = "phone cannot be null")
     @ApiModelProperty(required = true)
     private String phone;

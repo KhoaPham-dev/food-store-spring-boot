@@ -98,7 +98,7 @@ public class EmployeeController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Long accountCheck = accountRepository
-                .countAccountByPhone(createEmployeeForm.getPhone());
+                .countAccountByUsername(createEmployeeForm.getUsername());
         if (accountCheck > 0) {
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is existed");
         }

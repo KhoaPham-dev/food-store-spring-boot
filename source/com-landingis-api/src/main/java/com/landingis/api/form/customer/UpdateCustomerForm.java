@@ -13,8 +13,6 @@ import java.util.Date;
 public class UpdateCustomerForm {
     private String avatarPath;
 
-    @NotEmpty(message = "password cannot be null")
-    @ApiModelProperty(required = true)
     private String password;
 
     @NotNull(message = "id cannot be null")

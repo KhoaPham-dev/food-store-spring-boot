@@ -13,9 +13,11 @@ import java.util.Date;
 public class UpdateEmployeeForm {
     private String avatarPath;
 
-    @NotEmpty(message = "password cannot be null")
-    @ApiModelProperty(required = true)
     private String password;
+
+    @NotEmpty(message = "username cannot be null")
+    @ApiModelProperty(required = true)
+    private String username;
 
     @NotNull(message = "id cannot be null")
     @ApiModelProperty(required = true)
