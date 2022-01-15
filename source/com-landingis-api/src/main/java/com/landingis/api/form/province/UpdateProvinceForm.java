@@ -18,9 +18,6 @@ public class UpdateProvinceForm {
     @ApiModelProperty(required = true)
     private String provinceName;
 
-    @ApiModelProperty(name = "parentId")
-    private Long parentId;
-
     @Status
     @NotNull(message = "status cannot be null")
     @ApiModelProperty(required = true)

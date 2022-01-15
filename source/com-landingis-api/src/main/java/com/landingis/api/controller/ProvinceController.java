@@ -1,28 +1,19 @@
 package com.landingis.api.controller;
 
 import com.landingis.api.constant.LandingISConstant;
-import com.landingis.api.dto.ABasicAdminDto;
 import com.landingis.api.dto.ApiMessageDto;
 import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
-import com.landingis.api.dto.category.CategoryDto;
 import com.landingis.api.dto.province.ProvinceDto;
 import com.landingis.api.exception.RequestException;
-import com.landingis.api.form.category.CreateCategoryForm;
-import com.landingis.api.form.category.UpdateCategoryForm;
 import com.landingis.api.form.province.CreateProvinceForm;
 import com.landingis.api.form.province.UpdateProvinceForm;
-import com.landingis.api.mapper.CategoryMapper;
 import com.landingis.api.mapper.ProvinceMapper;
 import com.landingis.api.service.LandingIsApiService;
-import com.landingis.api.storage.criteria.CategoryCriteria;
 import com.landingis.api.storage.criteria.ProvinceCriteria;
-import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.Province;
-import com.landingis.api.storage.repository.CategoryRepository;
 import com.landingis.api.storage.repository.ProvinceRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +22,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1/province")
@@ -134,10 +124,6 @@ public class ProvinceController extends ABasicController {
         Province province = provinceRepository.findById(updateProvinceForm.getId()).orElse(null);
         if(province == null) {
             throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Not found province.");
-        }
-        if(province.getStatus().equals(updateProvinceForm.getStatus()) && province.getParentProvince() == null) {
-            province.getProvinceList().forEach(child -> child.setStatus(updateProvinceForm.getStatus()));
-            provinceRepository.saveAll(province.getProvinceList());
         }
         provinceMapper.fromUpdateProvinceFormToEntity(updateProvinceForm, province);
         provinceRepository.save(province);

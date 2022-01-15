@@ -1,6 +1,5 @@
 package com.landingis.api.form.province;
 
-import com.landingis.api.validation.CategoryKind;
 import com.landingis.api.validation.ProvinceKind;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
