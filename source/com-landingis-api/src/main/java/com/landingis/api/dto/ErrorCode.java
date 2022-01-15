@@ -56,5 +56,12 @@ public class ErrorCode {
     public static final String EMPLOYEE_ERROR_UNAUTHORIZED = "ERROR-EMPLOYEE-000";
     public static final String EMPLOYEE_ERROR_NOT_FOUND = "ERROR-EMPLOYEE-001";
 
+    /**
+     * Province error code
+     */
+    public static final String PROVINCE_ERROR_UNAUTHORIZED = "ERROR-PROVINCE-000";
+    public static final String PROVINCE_ERROR_NOT_FOUND = "ERROR-PROVINCE-001";
+
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }
