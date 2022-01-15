@@ -8,7 +8,6 @@ import java.util.Date;
 public class EmployeeDto extends ABasicAdminDto {
     private Long id;
     private String username;
-    private String password;
     private String address;
     private Date birthDay;
     private Integer sex;
