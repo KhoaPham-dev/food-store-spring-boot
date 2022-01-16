@@ -33,7 +33,7 @@ public interface AddressesMapper {
     void fromUpdateAddressesFormToEntity(UpdateAddressesForm updateAddressesForm, @MappingTarget Addresses addresses);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "customer_id", target = "customer.id")
+    @Mapping(source = "customer.id", target = "customer_id")
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "commune.name", target = "addressesCommune.name")
