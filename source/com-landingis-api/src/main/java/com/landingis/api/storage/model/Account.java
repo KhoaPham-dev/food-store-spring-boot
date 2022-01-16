@@ -7,6 +7,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = TablePrefix.PREFIX_TABLE+"account")
@@ -33,7 +35,6 @@ public class Account extends  Auditable<String>{
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;   // KIND --> 2
-
     @Column(name = "last_login")
     private Date lastLogin;
 

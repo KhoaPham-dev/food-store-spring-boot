@@ -62,6 +62,11 @@ public class ErrorCode {
     public static final String PROVINCE_ERROR_UNAUTHORIZED = "ERROR-PROVINCE-000";
     public static final String PROVINCE_ERROR_NOT_FOUND = "ERROR-PROVINCE-001";
 
+    /**
+     * Addresses error code
+     */
+    public static final String ADDRESSES_ERROR_UNAUTHORIZED = "ERROR-ADDRESSES-000";
+    public static final String ADDRESSES_ERROR_NOT_FOUND = "ERROR-ADDRESSES-001";
 
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

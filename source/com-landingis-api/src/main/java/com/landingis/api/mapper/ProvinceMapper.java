@@ -1,12 +1,8 @@
 package com.landingis.api.mapper;
 
-import com.landingis.api.dto.category.CategoryDto;
 import com.landingis.api.dto.province.ProvinceDto;
-import com.landingis.api.form.category.CreateCategoryForm;
-import com.landingis.api.form.category.UpdateCategoryForm;
 import com.landingis.api.form.province.CreateProvinceForm;
 import com.landingis.api.form.province.UpdateProvinceForm;
-import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.Province;
 import org.mapstruct.*;
 
