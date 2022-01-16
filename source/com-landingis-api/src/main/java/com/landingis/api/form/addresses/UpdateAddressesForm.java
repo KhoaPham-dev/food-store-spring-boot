@@ -9,6 +9,14 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class UpdateAddressesForm {
+    @NotEmpty(message = "name cannot be null")
+    @ApiModelProperty(required = true)
+    private String name;
+
+    @NotEmpty(message = "phone cannot be null")
+    @ApiModelProperty(required = true)
+    private String phone;
+
     @NotNull(message = "addresses_id cannot be null")
     @ApiModelProperty(required = true)
     private Long addresses_id;

@@ -1,6 +1,5 @@
 package com.landingis.api.storage.model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +17,9 @@ public class Addresses extends Auditable<String>{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
-    private Account account;
-
+    private Customer customer;
+    private String name;
+    private String phone;
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)

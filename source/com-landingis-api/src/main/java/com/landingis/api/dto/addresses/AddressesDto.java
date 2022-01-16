@@ -1,12 +1,14 @@
 package com.landingis.api.dto.addresses;
 
 import com.landingis.api.dto.ABasicAdminDto;
+import com.landingis.api.storage.model.Customer;
 import com.landingis.api.storage.model.Province;
 import lombok.Data;
 
 @Data
 public class AddressesDto extends ABasicAdminDto {
-    private String fullName;
+    private Long customer_id;
+    private String name;
     private String phone;
     private String address;
     private Province addressesDistrict;

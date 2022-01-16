@@ -12,19 +12,19 @@ import java.util.List;
 @Data
 public class AddressesCriteria {
     private Long id;
-    private String fullName;
+    private String name;
     private String phone;
     private String address;
     private Province district;
     private Province commune;
     private Province province;
 
-    public Specification<Province> getSpecification() {
+    public Specification<Addresses> getSpecification() {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Province> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<Addresses> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
                 List<Predicate> predicates = new ArrayList<>();
                 if(getId() != null) {
                     predicates.add(cb.equal(root.get("id"), getId()));
@@ -34,13 +34,11 @@ public class AddressesCriteria {
                     predicates.add(cb.like(cb.lower(root.get("address")), "%" + getAddress().toLowerCase() + "%"));
                 }
 
-                if(getPhone() != null) {
-                    Join<Account, Addresses> joinAccount = root.join("account", JoinType.INNER);
-                    predicates.add(cb.like(cb.lower(joinAccount.get("phone")), "%" + getPhone().toLowerCase() + "%"));
+                if(!StringUtils.isEmpty(getName())) {
+                    predicates.add(cb.like(cb.lower(root.get("name")), "%" + getName().toLowerCase() + "%"));
                 }
-                if(getFullName() != null) {
-                    Join<Account, Addresses> joinAccount = root.join("account", JoinType.INNER);
-                    predicates.add(cb.like(cb.lower(joinAccount.get("fullName")), "%" + getFullName().toLowerCase() + "%"));
+                if(!StringUtils.isEmpty(getPhone())) {
+                    predicates.add(cb.like(cb.lower(root.get("phone")), "%" + getPhone().toLowerCase() + "%"));
                 }
                 if(getDistrict() != null) {
                     Join<Province, Addresses> joinProvince = root.join("province", JoinType.INNER);

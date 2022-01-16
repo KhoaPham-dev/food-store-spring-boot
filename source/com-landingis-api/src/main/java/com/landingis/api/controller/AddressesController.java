@@ -13,9 +13,11 @@ import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.AddressesCriteria;
 import com.landingis.api.storage.model.Account;
 import com.landingis.api.storage.model.Addresses;
+import com.landingis.api.storage.model.Customer;
 import com.landingis.api.storage.model.Province;
 import com.landingis.api.storage.repository.AccountRepository;
 import com.landingis.api.storage.repository.AddressesRepository;
+import com.landingis.api.storage.repository.CustomerRepository;
 import com.landingis.api.storage.repository.ProvinceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/addresses")
@@ -39,7 +42,7 @@ public class AddressesController extends ABasicController{
     AddressesRepository addressesRepository;
 
     @Autowired
-    AccountRepository accountRepository;
+    CustomerRepository customerRepository;
 
     @Autowired
     AddressesMapper addressesMapper;
@@ -102,10 +105,9 @@ public class AddressesController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Addresses addresses = addressesMapper.fromCreateAddressesFormToEntity(createAddressesForm);
-        Account accountCheck = accountRepository
-                .findAccountByPhone(createAddressesForm.getPhone());
-        if (accountCheck == null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is not existed");
+        Customer customer = customerRepository.findById(createAddressesForm.getCustomer_id()).orElse(null);
+        if (customer == null) {
+            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "customer is not existed");
         }
         Province commune = provinceRepository.findById(createAddressesForm.getCommune_id()).orElse(null);
         Province district = provinceRepository.findById(createAddressesForm.getDistrict_id()).orElse(null);
@@ -114,7 +116,7 @@ public class AddressesController extends ABasicController{
         addresses.setCommune(commune);
         addresses.setDistrict(district);
         addresses.setProvince(province);
-        addresses.setAccount(accountCheck);
+        addresses.setCustomer(customer);
         addressesRepository.save(addresses);
         apiMessageDto.setMessage("Create addresses success");
         return apiMessageDto;

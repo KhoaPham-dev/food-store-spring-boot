@@ -11,9 +11,13 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class CreateAddressesForm {
-    @NotEmpty(message = "fullName cannot be null")
+    @NotNull(message = "customer_id cannot be null")
     @ApiModelProperty(required = true)
-    private String fullName;
+    private Long customer_id;
+
+    @NotEmpty(message = "name cannot be null")
+    @ApiModelProperty(required = true)
+    private String name;
 
     @NotEmpty(message = "phone cannot be null")
     @ApiModelProperty(required = true)
