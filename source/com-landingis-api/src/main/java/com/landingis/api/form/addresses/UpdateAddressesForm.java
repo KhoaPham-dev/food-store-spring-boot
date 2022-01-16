@@ -19,7 +19,7 @@ public class UpdateAddressesForm {
 
     @NotNull(message = "addresses_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long addresses_id;
+    private Long addressesId;
 
     @NotEmpty(message = "address cannot be null")
     @ApiModelProperty(required = true)
@@ -27,13 +27,13 @@ public class UpdateAddressesForm {
 
     @NotNull(message = "commune_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long commune_id;
+    private Long communeId;
 
     @NotNull(message = "district_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long district_id;
+    private Long districtId;
 
     @NotNull(message = "province_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long province_id;
+    private Long provinceId;
 }

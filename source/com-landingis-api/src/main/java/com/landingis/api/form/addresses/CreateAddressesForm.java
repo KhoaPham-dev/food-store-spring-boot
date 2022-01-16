@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 public class CreateAddressesForm {
     @NotNull(message = "customer_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long customer_id;
+    private Long customerId;
 
     @NotEmpty(message = "name cannot be null")
     @ApiModelProperty(required = true)
@@ -30,15 +30,15 @@ public class CreateAddressesForm {
 
     @NotNull(message = "commune_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long commune_id;
+    private Long communeId;
 
 
     @NotNull(message = "district_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long district_id;
+    private Long districtId;
 
 
     @NotNull(message = "province_id cannot be null")
     @ApiModelProperty(required = true)
-    private Long province_id;
+    private Long provinceId;
 }

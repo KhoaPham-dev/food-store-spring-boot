@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class AddressesDto extends ABasicAdminDto {
-    private Long customer_id;
+    private Long customerId;
     private String name;
     private String phone;
     private String address;

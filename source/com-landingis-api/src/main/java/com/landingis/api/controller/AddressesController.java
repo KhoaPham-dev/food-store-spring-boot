@@ -54,9 +54,6 @@ public class AddressesController extends ABasicController{
         if(commune == null || district == null || province == null){
             throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Not found province.");
         }
-        if(!province.getKind().equals(LandingISConstant.PROVINCE_KIND_PROVINCE)){
-            throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Wrong province.");
-        }
         if(!district.getParentProvince().getId().equals(province.getId())
                 || !commune.getParentProvince().getId().equals(district.getId())){
             throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Wrong province.");
@@ -105,17 +102,14 @@ public class AddressesController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Addresses addresses = addressesMapper.fromCreateAddressesFormToEntity(createAddressesForm);
-        Customer customer = customerRepository.findById(createAddressesForm.getCustomer_id()).orElse(null);
+        Customer customer = customerRepository.findById(createAddressesForm.getCustomerId()).orElse(null);
         if (customer == null) {
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "customer is not existed");
         }
-        Province commune = provinceRepository.findById(createAddressesForm.getCommune_id()).orElse(null);
-        Province district = provinceRepository.findById(createAddressesForm.getDistrict_id()).orElse(null);
-        Province province = provinceRepository.findById(createAddressesForm.getProvince_id()).orElse(null);
+        Province commune = provinceRepository.findById(createAddressesForm.getCommuneId()).orElse(null);
+        Province district = provinceRepository.findById(createAddressesForm.getDistrictId()).orElse(null);
+        Province province = provinceRepository.findById(createAddressesForm.getProvinceId()).orElse(null);
         checkProvince(commune,district,province);
-        addresses.setCommune(commune);
-        addresses.setDistrict(district);
-        addresses.setProvince(province);
         addresses.setCustomer(customer);
         addressesRepository.save(addresses);
         apiMessageDto.setMessage("Create addresses success");
@@ -131,14 +125,14 @@ public class AddressesController extends ABasicController{
             throw new RequestException(ErrorCode.ADDRESSES_ERROR_UNAUTHORIZED, "Not allowed to update.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        Addresses addresses = addressesRepository.findById(updateAddressesForm.getAddresses_id()).orElse(null);
+        Addresses addresses = addressesRepository.findById(updateAddressesForm.getAddressesId()).orElse(null);
         if(addresses == null) {
             throw new RequestException(ErrorCode.ADDRESSES_ERROR_NOT_FOUND, "Not found addresses.");
         }
         addressesMapper.fromUpdateAddressesFormToEntity(updateAddressesForm, addresses);
-        Province commune = provinceRepository.findById(updateAddressesForm.getCommune_id()).orElse(null);
-        Province district = provinceRepository.findById(updateAddressesForm.getDistrict_id()).orElse(null);
-        Province province = provinceRepository.findById(updateAddressesForm.getProvince_id()).orElse(null);
+        Province commune = provinceRepository.findById(updateAddressesForm.getCommuneId()).orElse(null);
+        Province district = provinceRepository.findById(updateAddressesForm.getDistrictId()).orElse(null);
+        Province province = provinceRepository.findById(updateAddressesForm.getProvinceId()).orElse(null);
         checkProvince(commune,district,province);
         addresses.setCommune(commune);
         addresses.setDistrict(district);
