@@ -107,7 +107,7 @@ public class CollaboratorController extends ABasicController{
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Username is existed");
         }
         Employee employee = employeeRepository.findById(createCollaboratorForm.getEmployeeId()).orElse(null);
-        if(employee == null){
+        if(employee == null ||employee.getStatus()==0){
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Employee does not exist!");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_COLLABORATOR;
@@ -119,6 +119,7 @@ public class CollaboratorController extends ABasicController{
         collaborator.getAccount().setGroup(group);
         collaborator.getAccount().setKind(LandingISConstant.USER_KIND_COLLABORATOR);
         collaborator.getAccount().setPassword(passwordEncoder.encode(createCollaboratorForm.getPassword()));
+        accountRepository.save(collaborator.getAccount());
         collaboratorRepository.save(collaborator);
         apiMessageDto.setMessage("Create collaborator success");
         return apiMessageDto;
