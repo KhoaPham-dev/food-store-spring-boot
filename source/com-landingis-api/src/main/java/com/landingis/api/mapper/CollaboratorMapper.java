@@ -1,13 +1,9 @@
 package com.landingis.api.mapper;
 
-import com.landingis.api.dto.Collaborator.CollaboratorDto;
-import com.landingis.api.dto.Employee.EmployeeDto;
+import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
-import com.landingis.api.form.employee.CreateEmployeeForm;
-import com.landingis.api.form.employee.UpdateEmployeeForm;
 import com.landingis.api.storage.model.Collaborator;
-import com.landingis.api.storage.model.Employee;
 import org.mapstruct.*;
 
 import java.util.List;

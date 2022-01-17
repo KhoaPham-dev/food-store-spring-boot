@@ -1,4 +1,4 @@
-package com.landingis.api.dto.Collaborator;
+package com.landingis.api.dto.collaborator;
 
 import com.landingis.api.dto.ABasicAdminDto;
 import lombok.Data;

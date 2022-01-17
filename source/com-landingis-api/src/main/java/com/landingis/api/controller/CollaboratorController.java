@@ -2,20 +2,16 @@ package com.landingis.api.controller;
 
 import com.landingis.api.constant.LandingISConstant;
 import com.landingis.api.dto.ApiMessageDto;
-import com.landingis.api.dto.Collaborator.CollaboratorDto;
-import com.landingis.api.dto.Employee.EmployeeDto;
+import com.landingis.api.dto.collaborator.CollaboratorDto;
+import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
-import com.landingis.api.form.employee.CreateEmployeeForm;
-import com.landingis.api.form.employee.UpdateEmployeeForm;
 import com.landingis.api.mapper.CollaboratorMapper;
-import com.landingis.api.mapper.EmployeeMapper;
 import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.CollaboratorCriteria;
-import com.landingis.api.storage.criteria.EmployeeCriteria;
 import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.Employee;
 import com.landingis.api.storage.model.Group;
@@ -34,7 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
 import javax.validation.Valid;
 
 @RestController
@@ -107,7 +102,7 @@ public class CollaboratorController extends ABasicController{
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Username is existed");
         }
         Employee employee = employeeRepository.findById(createCollaboratorForm.getEmployeeId()).orElse(null);
-        if(employee == null ||employee.getStatus()==0){
+        if(employee == null ||!employee.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
             throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Employee does not exist!");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_COLLABORATOR;
@@ -119,7 +114,6 @@ public class CollaboratorController extends ABasicController{
         collaborator.getAccount().setGroup(group);
         collaborator.getAccount().setKind(LandingISConstant.USER_KIND_COLLABORATOR);
         collaborator.getAccount().setPassword(passwordEncoder.encode(createCollaboratorForm.getPassword()));
-        accountRepository.save(collaborator.getAccount());
         collaboratorRepository.save(collaborator);
         apiMessageDto.setMessage("Create collaborator success");
         return apiMessageDto;
