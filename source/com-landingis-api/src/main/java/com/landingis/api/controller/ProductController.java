@@ -99,7 +99,7 @@ public class ProductController extends ABasicController{
 
         Product product = productMapper.fromCreateProductFormToEntity(createProductForm);
         Category categoryCheck = categoryRepository.findById(createProductForm.getCategoryId()).orElse(null);
-        if(categoryCheck == null){
+        if(categoryCheck == null || categoryCheck.getStatus()==0){
             throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Not found category");
         }
         if(createProductForm.getParentProductId() != null) {
