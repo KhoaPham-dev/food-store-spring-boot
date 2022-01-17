@@ -1,12 +1,14 @@
 package com.landingis.api.mapper;
 
 import com.landingis.api.dto.addresses.AddressesDto;
+import com.landingis.api.dto.category.CategoryDto;
 import com.landingis.api.dto.product.ProductDto;
 import com.landingis.api.form.addresses.CreateAddressesForm;
 import com.landingis.api.form.addresses.UpdateAddressesForm;
 import com.landingis.api.form.product.CreateProductForm;
 import com.landingis.api.form.product.UpdateProductForm;
 import com.landingis.api.storage.model.Addresses;
+import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.Product;
 import org.mapstruct.*;
 
@@ -55,5 +57,22 @@ public interface ProductMapper {
     ProductDto fromEntityToAdminDto(Product product);
 
     List<ProductDto> fromEntityListToProductDtoList(List<Product> products);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "category.id", target = "categoryId")
+    @Mapping(source = "hasChild", target = "hasChild")
+    @Mapping(source = "parentProduct.id", target = "parentProductId")
+    @Mapping(source = "price", target = "price")
+    @Mapping(source = "shortDescription", target = "shortDescription")
+    @Mapping(source = "saleoff", target = "saleoff")
+    @Mapping(source = "image", target = "image")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("adminAutoCompleteMapping")
+    ProductDto fromEntityToAdminDtoAutoComplete(Product product);
+
+    @IterableMapping(elementTargetType = ProductDto.class, qualifiedByName = "adminAutoCompleteMapping")
+    List<ProductDto> fromEntityListToProductDtoAutoComplete(List<Product> products);
+
 
 }

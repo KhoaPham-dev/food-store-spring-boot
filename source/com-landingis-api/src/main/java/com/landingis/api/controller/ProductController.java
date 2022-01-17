@@ -17,6 +17,7 @@ import com.landingis.api.form.product.UpdateProductForm;
 import com.landingis.api.mapper.NewsMapper;
 import com.landingis.api.mapper.ProductMapper;
 import com.landingis.api.service.LandingIsApiService;
+import com.landingis.api.storage.criteria.CategoryCriteria;
 import com.landingis.api.storage.criteria.NewsCriteria;
 import com.landingis.api.storage.criteria.ProductCriteria;
 import com.landingis.api.storage.model.Account;
@@ -74,6 +75,18 @@ public class ProductController extends ABasicController{
         return responseListObjApiMessageDto;
     }
 
+    @GetMapping(value = "/auto-complete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<ResponseListObj<ProductDto>> autoComplete(ProductCriteria productCriteria) {
+        ApiMessageDto<ResponseListObj<ProductDto>> responseListObjApiMessageDto = new ApiMessageDto<>();
+        productCriteria.setStatus(LandingISConstant.STATUS_ACTIVE);
+        Page<Product> listProduct = productRepository.findAll(productCriteria.getSpecification(), Pageable.unpaged());
+        ResponseListObj<ProductDto> responseListObj = new ResponseListObj<>();
+        responseListObj.setData(productMapper.fromEntityListToProductDtoAutoComplete(listProduct.getContent()));
+        responseListObjApiMessageDto.setData(responseListObj);
+        responseListObjApiMessageDto.setMessage("Get list success");
+        return responseListObjApiMessageDto;
+    }
+
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiMessageDto<ProductDto> get(@PathVariable("id") Long id) {
         if(!isAdmin()){
@@ -108,6 +121,7 @@ public class ProductController extends ABasicController{
                 throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "Not found product parent");
             }
             parentProduct.setHasChild(true);
+            productRepository.save(parentProduct);
             product.setParentProduct(parentProduct);
         }
         productRepository.save(product);

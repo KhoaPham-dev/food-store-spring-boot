@@ -14,7 +14,7 @@ public class ProductDto extends ABasicAdminDto {
     private String shortDescription;
     private Long categoryId;
     private Long parentProductId;
-    private Boolean hasChild;
+    private Boolean hasChild = false;
     private String labelColor;
     private Integer saleoff;
 }

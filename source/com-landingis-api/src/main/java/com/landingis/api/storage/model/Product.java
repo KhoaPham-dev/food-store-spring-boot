@@ -39,7 +39,7 @@ public class Product extends  Auditable<String> {
     @OneToMany(mappedBy = "parentProduct", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Product> productList;
 
-    private Boolean hasChild;
+    private Boolean hasChild = false;
 
     @Column(name = "label_color")
     private String labelColor = "#ffffff00";

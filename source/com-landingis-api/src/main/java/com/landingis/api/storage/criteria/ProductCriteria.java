@@ -15,6 +15,8 @@ public class ProductCriteria {
     private String name;
     private Long categoryId;
     private Integer saleoff;
+    private Integer status;
+
     public Specification<Product> getSpecification() {
         return new Specification<Product>() {
             private static final long serialVersionUID = 1L;
@@ -34,6 +36,9 @@ public class ProductCriteria {
                 }
                 if(getSaleoff() != null) {
                     predicates.add(cb.equal(root.get("saleoff"), getSaleoff()));
+                }
+                if(getStatus() != null) {
+                    predicates.add(cb.equal(root.get("status"), getStatus()));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }
