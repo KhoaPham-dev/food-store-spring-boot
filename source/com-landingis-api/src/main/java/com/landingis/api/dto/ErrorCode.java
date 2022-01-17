@@ -68,5 +68,12 @@ public class ErrorCode {
     public static final String ADDRESSES_ERROR_UNAUTHORIZED = "ERROR-ADDRESSES-000";
     public static final String ADDRESSES_ERROR_NOT_FOUND = "ERROR-ADDRESSES-001";
 
+    /**
+     * Product error code
+     */
+    public static final String PRODUCT_ERROR_UNAUTHORIZED = "ERROR-PRODUCT-000";
+    public static final String PRODUCT_ERROR_NOT_FOUND = "ERROR-PRODUCT-001";
+    public static final String PRODUCT_ERROR_NOT_HAS_CHILD = "ERROR-PRODUCT-002";
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

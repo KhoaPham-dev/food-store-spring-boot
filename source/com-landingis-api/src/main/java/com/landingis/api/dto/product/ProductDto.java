@@ -1,0 +1,20 @@
+package com.landingis.api.dto.product;
+
+import com.landingis.api.dto.ABasicAdminDto;
+import com.landingis.api.storage.model.Category;
+import com.landingis.api.storage.model.Product;
+import lombok.Data;
+
+@Data
+public class ProductDto extends ABasicAdminDto {
+    private String name;
+    private Double price;
+    private String image;
+    private String description;
+    private String shortDescription;
+    private Long categoryId;
+    private Long parentProductId;
+    private Boolean hasChild;
+    private String labelColor;
+    private Integer saleoff;
+}
