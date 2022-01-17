@@ -26,9 +26,6 @@ public class UpdateProductForm {
 
     private Integer productSaleoff;
 
-    @NotNull(message = "hasChild cannot be null")
-    @ApiModelProperty(required = true)
-    private Boolean hasChild;
 
     private String productImage;
 
@@ -36,5 +33,7 @@ public class UpdateProductForm {
     @ApiModelProperty(required = true)
     private Double productPrice;
 
+    @NotNull(message = "status cannot be null")
+    @ApiModelProperty(required = true)
     private Integer status;
 }

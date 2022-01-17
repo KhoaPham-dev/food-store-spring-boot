@@ -26,10 +26,6 @@ public class CreateProductForm {
     @ApiModelProperty(name = "parentId")
     private Long parentProductId;
 
-    @NotNull(message = "hasChild cannot be null")
-    @ApiModelProperty(required = true)
-    private Boolean hasChild;
-
     private String productImage;
 
     @NotNull(message = "price cannot be null")
@@ -40,5 +36,7 @@ public class CreateProductForm {
     @ApiModelProperty(required = true)
     private Long categoryId;
 
+    @NotNull(message = "status cannot be null")
+    @ApiModelProperty(required = true)
     private Integer status;
 }

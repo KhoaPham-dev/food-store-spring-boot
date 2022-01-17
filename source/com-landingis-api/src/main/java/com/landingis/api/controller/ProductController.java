@@ -107,9 +107,7 @@ public class ProductController extends ABasicController{
             if(parentProduct == null) {
                 throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "Not found product parent");
             }
-            if(!parentProduct.getHasChild()){
-                throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_HAS_CHILD, "Product parent not has child");
-            }
+            parentProduct.setHasChild(true);
             product.setParentProduct(parentProduct);
         }
         productRepository.save(product);
