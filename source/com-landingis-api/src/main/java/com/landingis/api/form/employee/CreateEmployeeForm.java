@@ -55,7 +55,7 @@ public class CreateEmployeeForm {
     @ApiModelProperty(required = true)
     private String identityNumber; //so cmnd
 
-    @NotEmpty(message = "dateOfIssue cannot be null")
+    @NotNull(message = "dateOfIssue cannot be null")
     @ApiModelProperty(required = true)
     private Date dateOfIssue; // ngay cap
 

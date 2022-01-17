@@ -16,6 +16,7 @@ import com.landingis.api.mapper.EmployeeMapper;
 import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.CustomerCriteria;
 import com.landingis.api.storage.criteria.EmployeeCriteria;
+import com.landingis.api.storage.model.Account;
 import com.landingis.api.storage.model.Customer;
 import com.landingis.api.storage.model.Employee;
 import com.landingis.api.storage.model.Group;
@@ -97,10 +98,9 @@ public class EmployeeController extends ABasicController{
             throw new RequestException(ErrorCode.EMPLOYEE_ERROR_UNAUTHORIZED, "Not allowed to create.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        Long accountCheck = accountRepository
-                .countAccountByUsername(createEmployeeForm.getUsername());
-        if (accountCheck > 0) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is existed");
+        Account accountCheck = accountRepository.findAccountByUsername(createEmployeeForm.getUsername());
+        if (accountCheck != null) {
+            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "username is existed");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_EMPLOYEE;
         Group group = groupRepository.findFirstByKind(groupKind);
@@ -111,6 +111,7 @@ public class EmployeeController extends ABasicController{
         employee.getAccount().setGroup(group);
         employee.getAccount().setKind(LandingISConstant.USER_KIND_EMPLOYEE);
         employee.getAccount().setPassword(passwordEncoder.encode(createEmployeeForm.getPassword()));
+        accountRepository.save(employee.getAccount());
         employeeRepository.save(employee);
         apiMessageDto.setMessage("Create employee success");
         return apiMessageDto;

@@ -1,12 +1,15 @@
 package com.landingis.api.storage.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = TablePrefix.PREFIX_TABLE+"employee")
 public class Employee extends Auditable<String>{
     @Id
@@ -14,7 +17,7 @@ public class Employee extends Auditable<String>{
     private Long id;
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "account_id")
-    @MapsId
+    /*@MapsId*/
     private Account account;
 
     private Date birthday;

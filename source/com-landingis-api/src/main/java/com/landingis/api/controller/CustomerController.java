@@ -111,6 +111,7 @@ public class CustomerController extends ABasicController{
         customer.getAccount().setGroup(group);
         customer.getAccount().setKind(LandingISConstant.USER_KIND_CUSTOMER);
         customer.getAccount().setPassword(passwordEncoder.encode(createCustomerForm.getPassword()));
+        accountRepository.save(customer.getAccount());
         customerRepository.save(customer);
         apiMessageDto.setMessage("Create customer success");
         return apiMessageDto;
