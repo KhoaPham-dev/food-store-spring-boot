@@ -1,7 +1,10 @@
 package com.landingis.api.dto.category;
 
 import com.landingis.api.dto.ABasicAdminDto;
+import com.landingis.api.dto.product.ProductDto;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class CategoryDto extends ABasicAdminDto {

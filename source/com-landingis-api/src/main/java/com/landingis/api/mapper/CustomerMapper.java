@@ -1,15 +1,18 @@
 package com.landingis.api.mapper;
 
 import com.landingis.api.dto.customer.CustomerDto;
+import com.landingis.api.dto.province.ProvinceDto;
 import com.landingis.api.form.customer.CreateCustomerForm;
 import com.landingis.api.form.customer.UpdateCustomerForm;
 import com.landingis.api.storage.model.Customer;
+import com.landingis.api.storage.model.Province;
 import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses={AccountMapper.class})
 public interface CustomerMapper {
 
     @Mapping(source = "email", target = "account.email")
@@ -57,5 +60,13 @@ public interface CustomerMapper {
     @IterableMapping(elementTargetType = CustomerDto.class, qualifiedByName = "adminGetMapping")
     List<CustomerDto> fromEntityListToCustomerDtoList(List<Customer> customers);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "account", target = "accountDto",qualifiedByName="accountAutoCompleteMapping")
+    @Mapping(source = "address", target = "address")
+    @Mapping(source = "birthday", target = "birthDay")
+    @Mapping(source = "sex", target = "sex")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("customerAutoCompleteMapping")
+    CustomerDto fromEntityToAdminDtoAutoComplete(Customer customer);
 
 }

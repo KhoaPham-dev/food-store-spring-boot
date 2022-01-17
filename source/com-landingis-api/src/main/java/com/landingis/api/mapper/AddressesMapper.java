@@ -8,7 +8,9 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses={CustomerMapper.class,ProvinceMapper.class})
 public interface AddressesMapper {
     @Mapping(source = "customerId", target = "customer.id")
     @Mapping(source = "name", target = "name")
@@ -29,18 +31,23 @@ public interface AddressesMapper {
     @Mapping(source = "districtId", target = "district.id")
     @Mapping(source = "provinceId", target = "province.id")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminCreateMapping")
+    @Named("adminUpdateMapping")
     void fromUpdateAddressesFormToEntity(UpdateAddressesForm updateAddressesForm, @MappingTarget Addresses addresses);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "customer.id", target = "customerId")
+    @Mapping(source = "customer", target = "customerDto",qualifiedByName="customerAutoCompleteMapping")
     @Mapping(source = "phone", target = "phone")
     @Mapping(source = "address", target = "address")
-    @Mapping(source = "commune.name", target = "addressesCommune.name")
-    @Mapping(source = "district.name", target = "addressesDistrict.name")
-    @Mapping(source = "province.name ", target = "addressesProvince.name")
+    @Mapping(source = "commune", target = "addressesCommuneDto",qualifiedByName="provinceAutoCompleteMapping")
+    @Mapping(source = "district", target = "addressesDistrictDto",qualifiedByName="provinceAutoCompleteMapping")
+    @Mapping(source = "province ", target = "addressesProvinceDto",qualifiedByName="provinceAutoCompleteMapping")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "modifiedDate", target = "modifiedDate")
+    @Mapping(source = "modifiedBy", target = "modifiedBy")
+    @Mapping(source = "createdDate", target = "createdDate")
+    @Mapping(source = "createdBy", target = "createdBy")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminCreateMapping")
+    @Named("adminGetMapping")
     AddressesDto fromEntityToAdminDto(Addresses addresses);
 
     @IterableMapping(elementTargetType = AddressesDto.class, qualifiedByName = "adminGetMapping")

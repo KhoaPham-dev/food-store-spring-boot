@@ -5,6 +5,8 @@ import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.Product;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ProductDto extends ABasicAdminDto {
     private String name;
@@ -17,4 +19,5 @@ public class ProductDto extends ABasicAdminDto {
     private Boolean hasChild = false;
     private String labelColor;
     private Integer saleoff;
+    private List<ProductDto> productDtoList;
 }

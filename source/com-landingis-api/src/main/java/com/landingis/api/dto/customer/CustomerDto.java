@@ -1,6 +1,7 @@
 package com.landingis.api.dto.customer;
 
 import com.landingis.api.dto.ABasicAdminDto;
+import com.landingis.api.dto.account.AccountDto;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 public class CustomerDto extends ABasicAdminDto {
 
     private Long id;
+    private AccountDto accountDto;
     private String address;
     private Date birthDay;
     private Integer sex;

@@ -42,9 +42,10 @@ public interface ProvinceMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "provinceName")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminAutoCompleteMapping")
+    @Named("provinceAutoCompleteMapping")
     ProvinceDto fromEntityToAdminDtoAutoComplete(Province province);
 
-    @IterableMapping(elementTargetType = ProvinceDto.class, qualifiedByName = "adminAutoCompleteMapping")
+    @IterableMapping(elementTargetType = ProvinceDto.class, qualifiedByName = "provinceAutoCompleteMapping")
+    @Named("provinceGetAutoCompleteListMapping")
     List<ProvinceDto> fromEntityListToProvinceDtoAutoComplete(List<Province> provinces);
 }

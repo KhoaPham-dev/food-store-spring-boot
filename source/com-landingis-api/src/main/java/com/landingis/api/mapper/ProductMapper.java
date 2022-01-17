@@ -67,11 +67,13 @@ public interface ProductMapper {
     @Mapping(source = "shortDescription", target = "shortDescription")
     @Mapping(source = "saleoff", target = "saleoff")
     @Mapping(source = "image", target = "image")
+    @Mapping(source = "productList", target = "productDtoList",qualifiedByName="productGetListAutoCompleteMapping")
     @BeanMapping(ignoreByDefault = true)
     @Named("adminAutoCompleteMapping")
     ProductDto fromEntityToAdminDtoAutoComplete(Product product);
 
     @IterableMapping(elementTargetType = ProductDto.class, qualifiedByName = "adminAutoCompleteMapping")
+    @Named("productGetListAutoCompleteMapping")
     List<ProductDto> fromEntityListToProductDtoAutoComplete(List<Product> products);
 
 
