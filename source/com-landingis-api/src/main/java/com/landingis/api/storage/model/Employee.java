@@ -15,7 +15,7 @@ public class Employee extends Auditable<String>{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "account_id")
     /*@MapsId*/
     private Account account;

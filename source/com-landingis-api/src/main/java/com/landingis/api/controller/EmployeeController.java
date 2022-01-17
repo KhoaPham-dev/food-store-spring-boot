@@ -2,7 +2,7 @@ package com.landingis.api.controller;
 
 import com.landingis.api.constant.LandingISConstant;
 import com.landingis.api.dto.ApiMessageDto;
-import com.landingis.api.dto.Employee.EmployeeDto;
+import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.dto.customer.CustomerDto;
@@ -111,7 +111,6 @@ public class EmployeeController extends ABasicController{
         employee.getAccount().setGroup(group);
         employee.getAccount().setKind(LandingISConstant.USER_KIND_EMPLOYEE);
         employee.getAccount().setPassword(passwordEncoder.encode(createEmployeeForm.getPassword()));
-        accountRepository.save(employee.getAccount());
         employeeRepository.save(employee);
         apiMessageDto.setMessage("Create employee success");
         return apiMessageDto;

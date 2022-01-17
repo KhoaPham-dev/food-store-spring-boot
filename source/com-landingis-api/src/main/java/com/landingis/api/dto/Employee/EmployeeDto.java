@@ -1,4 +1,4 @@
-package com.landingis.api.dto.Employee;
+package com.landingis.api.dto.employee;
 
 import com.landingis.api.dto.ABasicAdminDto;
 import lombok.Data;
