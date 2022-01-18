@@ -48,12 +48,12 @@ public class CollaboratorProductController extends ABasicController {
     LandingIsApiService landingIsApiService;
 
     private void checkKindAndValue(Integer kind, Double value) {
-        if(kind == 1){
+        if(kind.equals(LandingISConstant.COLLABORATOR_KIND_PERCENT)){
             if(!(value >= LandingISConstant.MIN_OF_PERCENT)||!(value <= LandingISConstant.MAX_OF_PERCENT)){
                 throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST, "Wrong value of kind percent");
             }
         }
-        if(kind == 2){
+        if(kind.equals(LandingISConstant.COLLABORATOR_KIND_DOLLAR)){
             if(!(value > LandingISConstant.MIN_PRICE)){
                 throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST, "Price can not be negative");
             }
