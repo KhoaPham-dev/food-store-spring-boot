@@ -1,5 +1,6 @@
 package com.landingis.api.form.product;
 
+import com.landingis.api.validation.Status;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -33,6 +34,7 @@ public class UpdateProductForm {
     @ApiModelProperty(required = true)
     private Double productPrice;
 
+    @Status
     @NotNull(message = "status cannot be null")
     @ApiModelProperty(required = true)
     private Integer status;
