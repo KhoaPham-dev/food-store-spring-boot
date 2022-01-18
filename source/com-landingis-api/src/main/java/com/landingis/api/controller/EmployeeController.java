@@ -100,12 +100,12 @@ public class EmployeeController extends ABasicController{
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Account accountCheck = accountRepository.findAccountByUsername(createEmployeeForm.getUsername());
         if (accountCheck != null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "username is existed");
+            throw new RequestException(ErrorCode.ACCOUNT_ERROR_EXIST, "username is existed");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_EMPLOYEE;
         Group group = groupRepository.findFirstByKind(groupKind);
         if (group == null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Group does not exist!");
+            throw new RequestException(ErrorCode.GROUP_ERROR_NOT_FOUND, "Group does not exist!");
         }
         Employee employee = employeeMapper.fromCreateEmployeeFormToEntity(createEmployeeForm);
         employee.getAccount().setGroup(group);

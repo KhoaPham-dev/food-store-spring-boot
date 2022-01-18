@@ -52,12 +52,12 @@ public class CollaboratorProductController extends ABasicController {
     private void checkKindAndValue(Integer kind, Double value) {
         if(kind == 1){
             if(!(value >= LandingISConstant.MIN_OF_PERCENT)||!(value <= LandingISConstant.MAX_OF_PERCENT)){
-                throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Wrong value of kind percent");
+                throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST, "Wrong value of kind percent");
             }
         }
         if(kind == 2){
             if(!(value > LandingISConstant.MIN_PRICE)){
-                throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Price can not be negative");
+                throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST, "Price can not be negative");
             }
         }
     }
@@ -104,11 +104,11 @@ public class CollaboratorProductController extends ABasicController {
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         Collaborator collaborator = collaboratorRepository.findById(createCollaboratorProductForm.getCollaboratorId()).orElse(null);
         if(collaborator == null ||!collaborator.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Collaborator does not exist!");
+            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "Collaborator does not exist!");
         }
         Product product = productRepository.findById(createCollaboratorProductForm.getProductId()).orElse(null);
         if(product == null ||!product.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Product does not exist!");
+            throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "Product does not exist!");
         }
         Integer kind = createCollaboratorProductForm.getKind();
         Double valueCheck = createCollaboratorProductForm.getValue();

@@ -49,6 +49,7 @@ public class ErrorCode {
      */
     public static final String ACCOUNT_ERROR_UNAUTHORIZED = "ERROR-ACCOUNT-000";
     public static final String ACCOUNT_ERROR_NOT_FOUND = "ERROR-ACCOUNT-001";
+    public static final String ACCOUNT_ERROR_EXIST = "ERROR-ACCOUNT-002";
 
     /**
      * Employee error code
@@ -61,6 +62,7 @@ public class ErrorCode {
      */
     public static final String PROVINCE_ERROR_UNAUTHORIZED = "ERROR-PROVINCE-000";
     public static final String PROVINCE_ERROR_NOT_FOUND = "ERROR-PROVINCE-001";
+    public static final String PROVINCE_ERROR_BAD_REQUEST = "ERROR-PROVINCE-002";
 
     /**
      * Addresses error code
@@ -86,6 +88,7 @@ public class ErrorCode {
      */
     public static final String COLLABORATOR_PRODUCT_ERROR_UNAUTHORIZED = "ERROR-COLLABORATOR_PRODUCT-000";
     public static final String COLLABORATOR_PRODUCT_ERROR_NOT_FOUND = "ERROR-COLLABORATOR-PRODUCT-001";
+    public static final String COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST = "ERROR-COLLABORATOR-PRODUCT-002";
 
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

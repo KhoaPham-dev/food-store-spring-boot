@@ -52,11 +52,11 @@ public class AddressesController extends ABasicController{
 
     public void checkProvince(Province commune, Province district, Province province) {
         if(commune == null || district == null || province == null){
-            throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Not found province.");
+            throw new RequestException(ErrorCode.PROVINCE_ERROR_BAD_REQUEST, "Wrong province.");
         }
         if(!district.getParentProvince().getId().equals(province.getId())
                 || !commune.getParentProvince().getId().equals(district.getId())){
-            throw new RequestException(ErrorCode.PROVINCE_ERROR_NOT_FOUND, "Wrong province.");
+            throw new RequestException(ErrorCode.PROVINCE_ERROR_BAD_REQUEST, "Wrong province.");
         }
     }
 
@@ -104,7 +104,7 @@ public class AddressesController extends ABasicController{
         Addresses addresses = addressesMapper.fromCreateAddressesFormToEntity(createAddressesForm);
         Customer customer = customerRepository.findById(createAddressesForm.getCustomerId()).orElse(null);
         if (customer == null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "customer is not existed");
+            throw new RequestException(ErrorCode.CUSTOMER_ERROR_NOT_FOUND, "customer is not existed");
         }
         Province commune = provinceRepository.findById(createAddressesForm.getCommuneId()).orElse(null);
         Province district = provinceRepository.findById(createAddressesForm.getDistrictId()).orElse(null);

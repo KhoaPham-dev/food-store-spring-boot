@@ -34,7 +34,7 @@ public class LandingISConstant {
     public static final Integer CATEGORY_KIND = 1;
 
     public static final Integer COLLABORATOR_KIND_PERCENT = 1;
-    public static final Integer COLLABORATOR_KIND_DOLLAR = 1;
+    public static final Integer COLLABORATOR_KIND_DOLLAR = 2;
 
 
     public static final Integer GENDER_MALE = 1;

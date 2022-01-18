@@ -100,12 +100,12 @@ public class CustomerController extends ABasicController{
         Long accountCheck = accountRepository
                 .countAccountByPhone(createCustomerForm.getPhone());
         if (accountCheck > 0) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Phone is existed");
+            throw new RequestException(ErrorCode.ACCOUNT_ERROR_EXIST, "Phone is existed");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_CUSTOMER;
         Group group = groupRepository.findFirstByKind(groupKind);
         if (group == null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Group does not exist!");
+            throw new RequestException(ErrorCode.GROUP_ERROR_NOT_FOUND, "Group does not exist!");
         }
         Customer customer = customerMapper.fromCreateCustomerFormToEntity(createCustomerForm);
         customer.getAccount().setGroup(group);

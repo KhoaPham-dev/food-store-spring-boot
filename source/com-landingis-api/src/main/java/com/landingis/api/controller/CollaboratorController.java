@@ -99,16 +99,16 @@ public class CollaboratorController extends ABasicController{
         Long accountCheck = accountRepository
                 .countAccountByUsername(createCollaboratorForm.getUsername());
         if (accountCheck > 0) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Username is existed");
+            throw new RequestException(ErrorCode.ACCOUNT_ERROR_EXIST, "Username is existed");
         }
         Employee employee = employeeRepository.findById(createCollaboratorForm.getEmployeeId()).orElse(null);
         if(employee == null ||!employee.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Employee does not exist!");
+            throw new RequestException(ErrorCode.EMPLOYEE_ERROR_NOT_FOUND, "Employee does not exist!");
         }
         Integer groupKind = LandingISConstant.GROUP_KIND_COLLABORATOR;
         Group group = groupRepository.findFirstByKind(groupKind);
         if (group == null) {
-            throw new RequestException(ErrorCode.GENERAL_ERROR_NOT_FOUND, "Group does not exist!");
+            throw new RequestException(ErrorCode.GROUP_ERROR_NOT_FOUND, "Group does not exist!");
         }
         Collaborator collaborator = collaboratorMapper.fromCreateCollaboratorFormToEntity(createCollaboratorForm);
         collaborator.getAccount().setGroup(group);
