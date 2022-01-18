@@ -2,10 +2,7 @@ package com.landingis.api.mapper;
 
 import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.dto.collaborator.CollaboratorProductDto;
-import com.landingis.api.form.collaborator.CreateCollaboratorForm;
-import com.landingis.api.form.collaborator.CreateCollaboratorProductForm;
-import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
-import com.landingis.api.form.collaborator.UpdateCollaboratorProductForm;
+import com.landingis.api.form.collaborator.*;
 import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.CollaboratorProduct;
 import org.mapstruct.*;
@@ -25,6 +22,9 @@ public interface CollaboratorProductMapper {
     @Named("adminCreateMapping")
     CollaboratorProduct fromCreateCollaboratorProductFormToEntity(CreateCollaboratorProductForm createCollaboratorProductForm);
 
+    @IterableMapping(elementTargetType = CollaboratorProduct.class, qualifiedByName = "adminCreateMapping")
+    List<CollaboratorProduct> fromCreateCollaboratorProductListFormToEntityList(List<CreateCollaboratorProductForm> createCollaboratorProductFormList);
+
     @Mapping(source = "id", target = "id")
     @Mapping(source = "kind", target = "kind")
     @Mapping(source = "value", target = "value")
@@ -32,6 +32,19 @@ public interface CollaboratorProductMapper {
     @BeanMapping(ignoreByDefault = true)
     @Named("adminUpdateMapping")
     void fromUpdateCollaboratorProductFormToEntity(UpdateCollaboratorProductForm updateCollaboratorProductForm, @MappingTarget CollaboratorProduct collaboratorProduct);
+
+    @IterableMapping(elementTargetType = CollaboratorProduct.class, qualifiedByName = "adminUpdateMapping")
+    List<CollaboratorProduct> fromUpdateCollaboratorProductListFormToEntityList(List<UpdateCollaboratorProductForm> updateCollaboratorProductFormList);
+
+    /*-------------------------DELETE FORM--------------------------*/
+    @Mapping(source = "id", target = "id")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("adminDeleteMapping")
+    void fromDeleteCollaboratorProductFormToEntity(DeleteCollaboratorProductForm deleteCollaboratorProductForm, @MappingTarget CollaboratorProduct collaboratorProduct);
+
+    @IterableMapping(elementTargetType = CollaboratorProduct.class, qualifiedByName = "adminDeleteMapping")
+    List<CollaboratorProduct> fromDeleteCollaboratorProductListFormToEntityList(List<DeleteCollaboratorProductForm> deleteCollaboratorProductFormList);
+
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "collaborator", target = "collaboratorDto",qualifiedByName="collaboratorAutoCompleteMapping")

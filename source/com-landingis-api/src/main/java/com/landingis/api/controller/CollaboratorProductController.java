@@ -7,10 +7,7 @@ import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.dto.collaborator.CollaboratorProductDto;
 import com.landingis.api.exception.RequestException;
-import com.landingis.api.form.collaborator.CreateCollaboratorForm;
-import com.landingis.api.form.collaborator.CreateCollaboratorProductForm;
-import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
-import com.landingis.api.form.collaborator.UpdateCollaboratorProductForm;
+import com.landingis.api.form.collaborator.*;
 import com.landingis.api.mapper.CollaboratorMapper;
 import com.landingis.api.mapper.CollaboratorProductMapper;
 import com.landingis.api.service.LandingIsApiService;
@@ -28,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/collaborator-product")
@@ -97,59 +95,76 @@ public class CollaboratorProductController extends ABasicController {
     }
 
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiMessageDto<String> create(@Valid @RequestBody CreateCollaboratorProductForm createCollaboratorProductForm, BindingResult bindingResult) {
+    public ApiMessageDto<String> create(@Valid @RequestBody CreateCollaboratorProductListForm createCollaboratorProductListForm, BindingResult bindingResult) {
         if(!isAdmin()){
             throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_UNAUTHORIZED, "Not allowed to create.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        Collaborator collaborator = collaboratorRepository.findById(createCollaboratorProductForm.getCollaboratorId()).orElse(null);
-        if(collaborator == null ||!collaborator.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
-            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "Collaborator does not exist!");
+        int check = 0;
+        List<CollaboratorProduct> collaboratorProductList = collaboratorProductMapper
+                .fromCreateCollaboratorProductListFormToEntityList(createCollaboratorProductListForm.getCreateCollaboratorProductFormList()) ;
+        for (CollaboratorProduct collaboratorProduct : collaboratorProductList){
+            Collaborator collaborator = collaboratorRepository.findById(collaboratorProduct.getCollaborator().getId()).orElse(null);
+            if(collaborator == null ||!collaborator.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+                throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "Collaborator of index " + check + " does not exist!");
+            }
+            Product product = productRepository.findById(collaboratorProduct.getProduct().getId()).orElse(null);
+            if(product == null ||!product.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+                throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "Product of index "+ check + " does not exist!");
+            }
+            Integer kind = collaboratorProduct.getKind();
+            Double valueCheck = collaboratorProduct.getValue();
+            checkKindAndValue(kind,valueCheck);
+
+            collaboratorProductList.set(check,collaboratorProduct);
         }
-        Product product = productRepository.findById(createCollaboratorProductForm.getProductId()).orElse(null);
-        if(product == null ||!product.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
-            throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "Product does not exist!");
-        }
-        Integer kind = createCollaboratorProductForm.getKind();
-        Double valueCheck = createCollaboratorProductForm.getValue();
-        checkKindAndValue(kind,valueCheck);
-        CollaboratorProduct collaboratorProduct = collaboratorProductMapper.fromCreateCollaboratorProductFormToEntity(createCollaboratorProductForm);
-        collaboratorProductRepository.save(collaboratorProduct);
-        apiMessageDto.setMessage("Create collaborator-product success");
+        collaboratorProductRepository.saveAll(collaboratorProductList);
+        apiMessageDto.setMessage("Create collaborator-product list success");
         return apiMessageDto;
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiMessageDto<String> update(@Valid @RequestBody UpdateCollaboratorProductForm updateCollaboratorProductForm, BindingResult bindingResult) {
+    public ApiMessageDto<String> update(@Valid @RequestBody UpdateCollaboratorProductListForm updateCollaboratorProductListForm, BindingResult bindingResult) {
         if(!isAdmin()){
             throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_UNAUTHORIZED, "Not allowed to update.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        CollaboratorProduct collaboratorProduct = collaboratorProductRepository.findById(updateCollaboratorProductForm.getId()).orElse(null);
-        if(collaboratorProduct == null) {
-            throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product.");
+        List<CollaboratorProduct> collaboratorProductList = collaboratorProductMapper
+                .fromUpdateCollaboratorProductListFormToEntityList(updateCollaboratorProductListForm.getUpdateCollaboratorProductFormList());
+        int check = 0;
+        for (CollaboratorProduct collaboratorProduct : collaboratorProductList){
+            CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository.findById(collaboratorProduct.getId()).orElse(null);
+            if(collaboratorProductCheck == null || !collaboratorProductCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)) {
+                throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product in index " + check);
+            }
+            checkKindAndValue(collaboratorProduct.getKind(),collaboratorProduct.getValue());
+
+            collaboratorProductList.set(check,collaboratorProduct);
         }
-        collaboratorProductMapper.fromUpdateCollaboratorProductFormToEntity(updateCollaboratorProductForm, collaboratorProduct);
-        checkKindAndValue(collaboratorProduct.getKind(),collaboratorProduct.getValue());
-        collaboratorProductRepository.save(collaboratorProduct);
-        apiMessageDto.setMessage("Update collaborator-product success");
+        collaboratorProductRepository.saveAll(collaboratorProductList);
+        apiMessageDto.setMessage("Update collaborator-product list success");
         return apiMessageDto;
     }
 
 
 
-    @DeleteMapping(value = "/delete/{id}")
-    public ApiMessageDto<CollaboratorProductDto> delete(@PathVariable("id") Long id) {
+    @DeleteMapping(value = "/delete")
+    public ApiMessageDto<CollaboratorProductDto> delete(@RequestBody DeleteCollaboratorProductListForm deleteCollaboratorProductListForm, BindingResult bindingResult) {
         if(!isAdmin()){
             throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_UNAUTHORIZED, "Not allowed to delete.");
         }
         ApiMessageDto<CollaboratorProductDto> result = new ApiMessageDto<>();
-
-        CollaboratorProduct collaboratorProduct = collaboratorProductRepository.findById(id).orElse(null);
-        if(collaboratorProduct == null) {
-            throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product");
+        List<CollaboratorProduct> collaboratorProductList = collaboratorProductMapper
+                .fromDeleteCollaboratorProductListFormToEntityList(deleteCollaboratorProductListForm.getDeleteCollaboratorProductFormList());
+        int check = 0;
+        for (CollaboratorProduct collaboratorProduct : collaboratorProductList){
+            CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository.findById(collaboratorProduct.getId()).orElse(null);
+            if(collaboratorProductCheck == null) {
+                throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product in index " + check);
+            }
+            collaboratorProductList.set(check,collaboratorProductCheck);
         }
-        collaboratorProductRepository.delete(collaboratorProduct);
+        collaboratorProductRepository.deleteAll(collaboratorProductList);
         result.setMessage("Delete collaborator-product success");
         return result;
     }
