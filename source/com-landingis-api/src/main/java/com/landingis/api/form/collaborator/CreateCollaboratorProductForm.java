@@ -1,5 +1,6 @@
 package com.landingis.api.form.collaborator;
 
+import com.landingis.api.validation.CollaboratorProductKind;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class CreateCollaboratorProductForm {
     @ApiModelProperty(required = true)
     private Long productId;
 
+    @CollaboratorProductKind
     @NotNull(message = "kind cannot be null")
     @ApiModelProperty(required = true)
     private Integer kind;
