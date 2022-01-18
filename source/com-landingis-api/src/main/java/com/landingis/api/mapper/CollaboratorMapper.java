@@ -1,8 +1,10 @@
 package com.landingis.api.mapper;
 
+import com.landingis.api.dto.category.CategoryDto;
 import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
+import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.Collaborator;
 import org.mapstruct.*;
 
@@ -78,5 +80,15 @@ public interface CollaboratorMapper {
 
     @IterableMapping(elementTargetType = CollaboratorDto.class, qualifiedByName = "adminGetMapping")
     List<CollaboratorDto> fromEntityListToCollaboratorDtoList(List<Collaborator> collaborators);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "account.fullName", target = "fullName")
+    @Mapping(source = "identityNumber", target = "identityNumber")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("collaboratorAutoCompleteMapping")
+    CollaboratorDto fromEntityToAdminDtoAutoComplete(Collaborator collaborator);
+
+    @IterableMapping(elementTargetType = CollaboratorDto.class, qualifiedByName = "collaboratorAutoCompleteMapping")
+    List<CollaboratorDto> fromEntityListToCollaboratorDtoAutoComplete(List<Collaborator> collaborators);
 
 }

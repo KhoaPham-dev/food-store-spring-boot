@@ -21,7 +21,7 @@ public class CollaboratorProductKindValidation implements ConstraintValidator<Co
             return true;
         }
         if(!Objects.equals(collaboratorProductKind, LandingISConstant.COLLABORATOR_KIND_PERCENT)
-            ||!Objects.equals(collaboratorProductKind, LandingISConstant.COLLABORATOR_KIND_DOLLAR)) {
+            &&!Objects.equals(collaboratorProductKind, LandingISConstant.COLLABORATOR_KIND_DOLLAR)) {
             return false;
         }
         return true;

@@ -13,7 +13,8 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {ProductMapper.class,CollaboratorMapper.class})
 public interface CollaboratorProductMapper {
     @Mapping(source = "collaboratorId", target = "collaborator.id")
     @Mapping(source = "productId", target = "product.id")
@@ -33,11 +34,15 @@ public interface CollaboratorProductMapper {
     void fromUpdateCollaboratorProductFormToEntity(UpdateCollaboratorProductForm updateCollaboratorProductForm, @MappingTarget CollaboratorProduct collaboratorProduct);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "collaborator.id", target = "collaboratorId")
-    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "collaborator", target = "collaboratorDto",qualifiedByName="collaboratorAutoCompleteMapping")
+    @Mapping(source = "product", target = "productDto",qualifiedByName="productAutoCompleteMapping")
     @Mapping(source = "kind", target = "kind")
     @Mapping(source = "value", target = "value")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "modifiedDate", target = "modifiedDate")
+    @Mapping(source = "modifiedBy", target = "modifiedBy")
+    @Mapping(source = "createdDate", target = "createdDate")
+    @Mapping(source = "createdBy", target = "createdBy")
     @BeanMapping(ignoreByDefault = true)
     @Named("adminGetMapping")
     CollaboratorProductDto fromEntityToCollaboratorProductDto(CollaboratorProduct collaboratorProduct);
