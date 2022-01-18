@@ -81,5 +81,11 @@ public class ErrorCode {
     public static final String COLLABORATOR_ERROR_UNAUTHORIZED = "ERROR-COLLABORATOR-000";
     public static final String COLLABORATOR_ERROR_NOT_FOUND = "ERROR-COLLABORATOR-001";
 
+    /**
+     * Collaborator-Product error code
+     */
+    public static final String COLLABORATOR_PRODUCT_ERROR_UNAUTHORIZED = "ERROR-COLLABORATOR_PRODUCT-000";
+    public static final String COLLABORATOR_PRODUCT_ERROR_NOT_FOUND = "ERROR-COLLABORATOR-PRODUCT-001";
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

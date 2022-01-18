@@ -26,6 +26,11 @@ public class LandingISConstant {
     public static final Integer MAX_ATTEMPT_LOGIN = 5;
     public static final Integer MAX_TIME_VERIFY_ACCOUNT = 5 * 60 * 1000; //5 minutes
 
+    public static final Integer MIN_OF_PERCENT = 0;
+    public static final Integer MAX_OF_PERCENT = 100;
+
+    public static final Integer MIN_PRICE = 0;
+
     public static final Integer CATEGORY_KIND = 1;
 
 
