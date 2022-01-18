@@ -1,6 +1,7 @@
 package com.landingis.api.form.collaborator;
 
 import com.landingis.api.validation.CollaboratorProductKind;
+import com.landingis.api.validation.Status;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class UpdateCollaboratorProductForm {
     @ApiModelProperty(required = true)
     private Double value;
 
+    @Status
     @NotNull(message = "status cannot be null")
     @ApiModelProperty(required = true)
     private Integer status;
