@@ -115,8 +115,7 @@ public class CollaboratorProductController extends ABasicController {
             Integer kind = collaboratorProduct.getKind();
             Double valueCheck = collaboratorProduct.getValue();
             checkKindAndValue(kind,valueCheck);
-
-            collaboratorProductList.set(check,collaboratorProduct);
+            check++;
         }
         collaboratorProductRepository.saveAll(collaboratorProductList);
         apiMessageDto.setMessage("Create collaborator-product list success");
@@ -138,8 +137,7 @@ public class CollaboratorProductController extends ABasicController {
                 throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product in index " + check);
             }
             checkKindAndValue(collaboratorProduct.getKind(),collaboratorProduct.getValue());
-
-            collaboratorProductList.set(check,collaboratorProduct);
+            check++;
         }
         collaboratorProductRepository.saveAll(collaboratorProductList);
         apiMessageDto.setMessage("Update collaborator-product list success");
@@ -162,7 +160,7 @@ public class CollaboratorProductController extends ABasicController {
             if(collaboratorProductCheck == null) {
                 throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "Not found collaborator-product in index " + check);
             }
-            collaboratorProductList.set(check,collaboratorProductCheck);
+            check++;
         }
         collaboratorProductRepository.deleteAll(collaboratorProductList);
         result.setMessage("Delete collaborator-product success");
