@@ -1,9 +1,11 @@
 package com.landingis.api.mapper;
 
+import com.landingis.api.dto.customer.CustomerDto;
 import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.form.employee.CreateEmployeeForm;
 import com.landingis.api.form.employee.UpdateEmployeeForm;
+import com.landingis.api.storage.model.Customer;
 import com.landingis.api.storage.model.Employee;
 import org.mapstruct.*;
 
@@ -84,4 +86,12 @@ public interface EmployeeMapper {
     @IterableMapping(elementTargetType = EmployeeDto.class, qualifiedByName = "adminGetMapping")
     List<EmployeeDto> fromEntityListToEmployeeDtoList(List<Employee> employees);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "account", target = "accountDto",qualifiedByName="accountAutoCompleteMapping")
+    @Mapping(source = "address", target = "address")
+    @Mapping(source = "birthday", target = "birthDay")
+    @Mapping(source = "sex", target = "sex")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("employeeAutoCompleteMapping")
+    EmployeeDto fromEntityToAdminDtoAutoComplete(Employee employee);
 }

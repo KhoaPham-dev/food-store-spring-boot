@@ -45,6 +45,17 @@ public class LandingISConstant {
     public static final Integer PROVINCE_KIND_DISTRICT = 2;
     public static final Integer PROVINCE_KIND_PROVINCE = 3;
 
+    public static final Integer ORDERS_STATE_CREATED = 0;
+    public static final Integer ORDERS_STATE_ACCEPTED = 1;
+    public static final Integer ORDERS_STATE_SHIPPING = 2;
+    public static final Integer ORDERS_STATE_DONE = 3;
+    public static final Integer ORDERS_STATE_CANCELED = 4;
+
+    public static final Integer PAYMENT_METHOD_COD = 1;
+    public static final Integer PAYMENT_METHOD_ONLINE = 2;
+
+    public static final Integer ORDER_VAT = 10;
+
 
     private LandingISConstant(){
         throw new IllegalStateException("Utility class");

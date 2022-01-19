@@ -1,12 +1,14 @@
 package com.landingis.api.dto.employee;
 
 import com.landingis.api.dto.ABasicAdminDto;
+import com.landingis.api.dto.account.AccountDto;
 import lombok.Data;
 
 import java.util.Date;
 @Data
 public class EmployeeDto extends ABasicAdminDto {
     private Long id;
+    private AccountDto accountDto;
     private String username;
     private String address;
     private Date birthDay;

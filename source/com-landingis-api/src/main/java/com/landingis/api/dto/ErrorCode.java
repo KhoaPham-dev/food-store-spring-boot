@@ -90,5 +90,12 @@ public class ErrorCode {
     public static final String COLLABORATOR_PRODUCT_ERROR_NOT_FOUND = "ERROR-COLLABORATOR-PRODUCT-001";
     public static final String COLLABORATOR_PRODUCT_ERROR_BAD_REQUEST = "ERROR-COLLABORATOR-PRODUCT-002";
 
+    /**
+     * Orders error code
+     */
+    public static final String ORDERS_ERROR_UNAUTHORIZED = "ERROR-ORDERS-000";
+    public static final String ORDERS_ERROR_NOT_FOUND = "ERROR-ORDERS-001";
+    public static final String ORDERS_ERROR_BAD_REQUEST = "ERROR-ORDERS-002";
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }
