@@ -52,6 +52,9 @@ public class OrdersController extends ABasicController{
     CollaboratorRepository collaboratorRepository;
 
     @Autowired
+    AccountRepository accountRepository;
+
+    @Autowired
     CollaboratorProductRepository collaboratorProductRepository;
 
     @Autowired
@@ -122,9 +125,18 @@ public class OrdersController extends ABasicController{
         List<OrdersDetail> ordersDetailList = ordersDetailMapper
                 .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
         Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
-        Customer customerCheck = customerRepository.findById(createOrdersForm.getCustomerId()).orElse(null);
+        Customer customerCheck = customerRepository.findByPhone(createOrdersForm.getReceiverPhone());
         if (customerCheck == null) {
-            throw new RequestException(ErrorCode.CUSTOMER_ERROR_NOT_FOUND, "customer is not existed");
+            Customer savedCustomer = new Customer();
+            savedCustomer.getAccount().setPhone(createOrdersForm.getReceiverPhone());
+            savedCustomer.getAccount().setFullName(createOrdersForm.getReceiverName());
+            savedCustomer.getAccount().setKind(LandingISConstant.USER_KIND_CUSTOMER);
+            savedCustomer.setAddress(createOrdersForm.getAddress());
+            savedCustomer = customerRepository.save(savedCustomer);
+            orders.setCustomer(savedCustomer);
+        }
+        else{
+            orders.setCustomer(customerCheck);
         }
         Integer checkSaleOff = createOrdersForm.getSaleOff();
         if(!(checkSaleOff >= LandingISConstant.MIN_OF_PERCENT) || !(checkSaleOff <= LandingISConstant.MAX_OF_PERCENT)){
@@ -182,6 +194,7 @@ public class OrdersController extends ABasicController{
         ordersDetailRepository.saveAll(ordersDetailList);
         /*-----------------------Quay lại xử lý orders------------------ */
         amountPrice = amountPrice - amountPrice*(orders.getSaleOff()/100 + LandingISConstant.ORDER_VAT/100);
+        amountPrice = Math.round(amountPrice*100.0)/100.0; // Làm tròn đến thập phân thứ 2
         orders.setTotalMoney(amountPrice);
         orders.setVat(LandingISConstant.ORDER_VAT);
         ordersRepository.save(orders);

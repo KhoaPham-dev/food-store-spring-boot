@@ -17,6 +17,7 @@ public class Customer extends Auditable<String>{
 
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "account_id")
+    @MapsId
     private Account account;
 
     @Column(name = "address")

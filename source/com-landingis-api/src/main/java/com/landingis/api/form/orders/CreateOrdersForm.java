@@ -16,11 +16,6 @@ import java.util.List;
 
 @Data
 public class CreateOrdersForm {
-    @NotNull(message = "customerId cannot be null")
-    @ApiModelProperty(required = true)
-    private Long customerId;
-
-
     @NotNull(message = "saleOff cannot be null")
     @ApiModelProperty(required = true)
     private Integer saleOff;

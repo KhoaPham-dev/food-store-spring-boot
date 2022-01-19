@@ -16,7 +16,6 @@ import java.util.List;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         uses = {CustomerMapper.class,CollaboratorMapper.class,EmployeeMapper.class})
 public interface OrdersMapper {
-    @Mapping(source = "customerId", target = "customer.id")
     @Mapping(source = "saleOff", target = "saleOff")
     @Mapping(source = "state", target = "state")
     @Mapping(source = "prevState", target = "prevState")
