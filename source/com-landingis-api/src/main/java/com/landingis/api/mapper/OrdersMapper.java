@@ -22,8 +22,6 @@ public interface OrdersMapper {
     @Mapping(source = "prevState", target = "prevState")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "receiverName", target = "receiverName")
-    @Mapping(source = "employeeId", target = "employee.id")
-    @Mapping(source = "collaboratorId", target = "collaborator.id")
     @Mapping(source = "paymentMethod", target = "paymentMethod")
     @Mapping(source = "status", target = "status")
     @BeanMapping(ignoreByDefault = true)

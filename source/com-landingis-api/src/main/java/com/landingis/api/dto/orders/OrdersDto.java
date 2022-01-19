@@ -8,6 +8,8 @@ import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.Employee;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OrdersDto extends ABasicAdminDto {
     private Long id;
@@ -24,5 +26,5 @@ public class OrdersDto extends ABasicAdminDto {
     private CollaboratorDto collaboratorDto;
     private String code;
     private Integer paymentMethod;
-    private OrdersDetailDto ordersDetailDto;
+    private List<OrdersDetailDto> ordersDetailDtoList;
 }

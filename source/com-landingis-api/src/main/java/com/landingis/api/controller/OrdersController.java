@@ -5,6 +5,7 @@ import com.landingis.api.dto.ApiMessageDto;
 import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.dto.employee.EmployeeDto;
+import com.landingis.api.dto.orders.OrdersDetailDto;
 import com.landingis.api.dto.orders.OrdersDto;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.employee.CreateEmployeeForm;
@@ -101,7 +102,11 @@ public class OrdersController extends ABasicController{
         if(orders == null) {
             throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Not found orders.");
         }
-        result.setData(ordersMapper.fromEntityToOrdersDto(orders));
+        List<OrdersDetailDto> ordersDetailDtoList = ordersDetailMapper
+                .fromEntityListToOrdersDetailDtoList(ordersDetailRepository.findAllByOrderId(id));
+        OrdersDto ordersDto = ordersMapper.fromEntityToOrdersDto(orders);
+        ordersDto.setOrdersDetailDtoList(ordersDetailDtoList);
+        result.setData(ordersDto);
         result.setMessage("Get orders success");
         return result;
     }
@@ -114,8 +119,9 @@ public class OrdersController extends ABasicController{
             throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        List<OrdersDetail> ordersDetailList = ordersDetailMapper
+                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
         Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
-        boolean isCreatedByCollaborator = false; // Kiểm tra xem người tạo đơn có phải CTV ko
         Customer customerCheck = customerRepository.findById(createOrdersForm.getCustomerId()).orElse(null);
         if (customerCheck == null) {
             throw new RequestException(ErrorCode.CUSTOMER_ERROR_NOT_FOUND, "customer is not existed");
@@ -124,61 +130,58 @@ public class OrdersController extends ABasicController{
         if(!(checkSaleOff >= LandingISConstant.MIN_OF_PERCENT) || !(checkSaleOff <= LandingISConstant.MAX_OF_PERCENT)){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
         }
-        if(createOrdersForm.getEmployeeId() == null && createOrdersForm.getCollaboratorId() == null){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "employee and collaborator can not be null");
+        Long checkAccount = getCurrentUserId();
+        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
+        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
+        int checkIndex = 0;
+        if(checkCollaborator != null){
+            orders.setEmployee(checkCollaborator.getEmployee());
+            orders.setCollaborator(checkCollaborator);
+            for (OrdersDetail ordersDetail : ordersDetailList){
+                CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository
+                        .findByCollaboratorIdAndProductId(checkCollaborator.getId(),ordersDetail.getProduct().getId());
+                if(collaboratorProductCheck == null){
+                    throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "collaborator-product in index "+checkIndex+"is not existed");
+                }
+            }
         }
-        if(createOrdersForm.getCollaboratorId() != null){
-            if(createOrdersForm.getEmployeeId() != null){
-                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "employee should be null");
-            }
-            Collaborator collaboratorCheck = collaboratorRepository.findById(createOrdersForm.getCollaboratorId()).orElse(null);
-            if(collaboratorCheck == null){
-                throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "collaborator is not existed");
-            }
-            isCreatedByCollaborator = true;
-            orders.setEmployee(collaboratorCheck.getEmployee());
-        }
-        if(createOrdersForm.getCollaboratorId() == null){
-            Employee employeeCheck = employeeRepository.findById(createOrdersForm.getEmployeeId()).orElse(null);
-            if (employeeCheck == null) {
-                throw new RequestException(ErrorCode.EMPLOYEE_ERROR_NOT_FOUND, "employee is not existed");
-            }
+        if(checkEmployee != null){
+            orders.setEmployee(checkEmployee);
         }
         orders.setCode(generateCode());
         Orders savedOrder = ordersRepository.save(orders);
         /*-----------------------Xử lý orders detail------------------ */
         Double amountPrice = 0.0;  //Tổng tiền hóa đơn
-        List<OrdersDetail> ordersDetailList = ordersDetailMapper
-                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
-        int checkIndex = 0;
+
+        checkIndex = 0;
         for (OrdersDetail ordersDetail : ordersDetailList){
+            Double collaboratorCommission = null;
             Product productCheck = productRepository.findById(ordersDetail.getProduct().getId()).orElse(null);
             if (productCheck == null){
                 throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "product in index "+checkIndex+"is not existed");
             }
             Double productPrice = productCheck.getPrice();
-            ordersDetail.setPrice(productPrice);
-            amountPrice = amountPrice + productPrice * (ordersDetail.getAmount()); // Tổng tiền hóa đơn
-            if(isCreatedByCollaborator){
+            Double priceProductAfterSale = productPrice - (productPrice * productCheck.getSaleoff()/100);
+            ordersDetail.setPrice(priceProductAfterSale);
+            amountPrice = amountPrice + priceProductAfterSale * (ordersDetail.getAmount()); // Tổng tiền hóa đơn
+            if(checkCollaborator != null){
                 CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository
-                        .findByCollaboratorIdAndProductId(createOrdersForm.getCollaboratorId(),ordersDetail.getProduct().getId());
-                if(collaboratorProductCheck == null){
-                    throw new RequestException(ErrorCode.COLLABORATOR_PRODUCT_ERROR_NOT_FOUND, "collaborator-product in index "+checkIndex+"is not existed");
-                }
+                        .findByCollaboratorIdAndProductId(checkCollaborator.getId(),ordersDetail.getProduct().getId());
                 ordersDetail.setKind(collaboratorProductCheck.getKind());
                 ordersDetail.setValue(collaboratorProductCheck.getValue());
                 if(collaboratorProductCheck.getKind() == LandingISConstant.COLLABORATOR_KIND_PERCENT){
-                    Double collaboratorCommission = (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
+                    collaboratorCommission = (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
                 }
-                if (collaboratorProductCheck.getKind() == LandingISConstant.COLLABORATOR_KIND_DOLLAR){
-                    Double collaboratorCommission = collaboratorProductCheck.getValue() * ordersDetail.getAmount();
+                else if (collaboratorProductCheck.getKind() == LandingISConstant.COLLABORATOR_KIND_DOLLAR){
+                    collaboratorCommission = collaboratorProductCheck.getValue() * ordersDetail.getAmount();
                 }
             }
+            ordersDetail.setCollaboratorCommission(collaboratorCommission);
             ordersDetail.setOrders(savedOrder);
         }
         ordersDetailRepository.saveAll(ordersDetailList);
-
         /*-----------------------Quay lại xử lý orders------------------ */
+        amountPrice = amountPrice - amountPrice*(orders.getSaleOff()/100 + LandingISConstant.ORDER_VAT/100);
         orders.setTotalMoney(amountPrice);
         orders.setVat(LandingISConstant.ORDER_VAT);
         ordersRepository.save(orders);

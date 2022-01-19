@@ -45,10 +45,6 @@ public class CreateOrdersForm {
     @ApiModelProperty(required = true)
     private String receiverPhone;
 
-    private Long employeeId;
-
-    private Long collaboratorId;
-
     @PaymentMethod
     @NotNull(message = "paymentMethod cannot be null")
     @ApiModelProperty(required = true)
