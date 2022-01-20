@@ -8,6 +8,7 @@ import com.landingis.api.dto.orders.OrdersDetailDto;
 import com.landingis.api.dto.orders.OrdersDto;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.orders.CreateOrdersForm;
+import com.landingis.api.form.orders.DeleteOrdersDetailForm;
 import com.landingis.api.form.orders.UpdateOrdersForm;
 import com.landingis.api.form.orders.UpdateStateOrdersForm;
 import com.landingis.api.mapper.OrdersDetailMapper;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -68,12 +71,6 @@ public class OrdersController extends ABasicController{
     @Autowired
     LandingIsApiService landingIsApiService;
 
-    private String generateCode() {
-        String code = StringUtils.generateRandomString(8);
-        code = code.replace("0", "A");
-        code = code.replace("O", "Z");
-        return code;
-    }
 
     @GetMapping(value = "/list",produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiMessageDto<ResponseListObj<OrdersDto>> list(OrdersCriteria ordersCriteria, Pageable pageable){
@@ -112,6 +109,115 @@ public class OrdersController extends ABasicController{
         result.setMessage("Get orders success");
         return result;
     }
+
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
+        if(!isAdmin()){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        List<OrdersDetail> ordersDetailList = ordersDetailMapper
+                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
+        Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
+        setCustomerCreateForm(orders,createOrdersForm);
+        Integer checkSaleOff = createOrdersForm.getSaleOff();
+        if((checkSaleOff < LandingISConstant.MIN_OF_PERCENT) || (checkSaleOff > LandingISConstant.MAX_OF_PERCENT)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
+        }
+        Long checkAccount = getCurrentUserId();
+        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
+        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
+        validateCollaboratorAndEmployee(checkCollaborator,checkEmployee, ordersDetailList,orders);
+        orders.setCode(generateCode());
+        Orders savedOrder = ordersRepository.save(orders);
+        /*-----------------------Xử lý orders detail------------------ */
+        amountPriceCal(orders,ordersDetailList,checkCollaborator,savedOrder);  //Tổng tiền hóa đơn
+        ordersDetailRepository.saveAll(ordersDetailList);
+        /*-----------------------Quay lại xử lý orders------------------ */
+
+        ordersRepository.save(orders);
+        apiMessageDto.setMessage("Create orders success");
+        return apiMessageDto;
+    }
+    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> update(@Valid @RequestBody UpdateOrdersForm updateOrdersForm, BindingResult bindingResult) {
+        if(!isAdmin()){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to update.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        // Lúc này orders sẽ là orders đang trong database (orders cũ)
+        Orders orders = ordersRepository.findById(updateOrdersForm.getId()).orElse(null);
+        if(orders == null){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
+        }
+        if(!orders.getState().equals(LandingISConstant.ORDERS_STATE_CREATED)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update info in this state");
+        }
+        setCustomerUpdateForm(updateOrdersForm, orders);
+        checkSizeProducts(updateOrdersForm);
+        //Map update form vô orders --> orders lúc này là orders mới với thông tin mới
+        ordersMapper.fromUpdateOrdersFormToEntity(updateOrdersForm,orders);
+        List<OrdersDetail> ordersDetailDeleteList = setDeleteList(updateOrdersForm);
+        List<OrdersDetail> ordersDetailUpdateList = ordersDetailMapper
+                .fromUpdateOrdersDetailFormListToOrdersDetailList(updateOrdersForm.getUpdateOrdersDetailFormList());
+        if(ordersDetailUpdateList != null && !ordersDetailDeleteList.isEmpty()){
+            checkSameProduct(ordersDetailUpdateList,ordersDetailDeleteList);
+        }
+        if(!ordersDetailDeleteList.isEmpty()){
+            ordersDetailRepository.deleteAll(ordersDetailDeleteList);
+        }
+        if(ordersDetailUpdateList != null){
+            checkProducts(orders.getId(),ordersDetailUpdateList);
+            amountPriceCal(orders,ordersDetailUpdateList,orders.getCollaborator(),orders);
+            ordersDetailRepository.saveAll(ordersDetailUpdateList);
+        }
+        ordersRepository.save(orders);
+        apiMessageDto.setMessage("Update orders success");
+        return apiMessageDto;
+    }
+
+    @PutMapping(value = "/update-state", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> update(@Valid @RequestBody UpdateStateOrdersForm updateStateOrdersForm, BindingResult bindingResult) {
+        if (!isAdmin()) {
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to update.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        Orders orders = ordersRepository.findById(updateStateOrdersForm.getId()).orElse(null);
+        if(orders == null){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
+        }
+        checkNewState(updateStateOrdersForm,orders);
+        Integer prevState = orders.getState();
+        orders.setState(updateStateOrdersForm.getState());
+        orders.setPrevState(prevState);
+        ordersRepository.save(orders);
+        apiMessageDto.setMessage("Update orders state success");
+        return apiMessageDto;
+    }
+
+    @PutMapping(value = "/cancel-orders/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> cancelOrders(@PathVariable("id") Long id) {
+        if (!isAdmin()) {
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to cancel orders.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        Orders orders = ordersRepository.findById(id).orElse(null);
+        if(orders == null){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Order Not Found");
+        }
+        checkState(orders);
+        Integer prevState = orders.getState();
+        orders.setState(LandingISConstant.ORDERS_STATE_CANCELED);
+        orders.setPrevState(prevState);
+        ordersRepository.save(orders);
+        apiMessageDto.setMessage("Cancel order success");
+        return apiMessageDto;
+    }
+
     private void setCustomerCreateForm(Orders orders, CreateOrdersForm createOrdersForm) {
         Customer customerCheck = customerRepository.findByPhone(createOrdersForm.getReceiverPhone());
         if (customerCheck == null) {
@@ -157,7 +263,9 @@ public class OrdersController extends ABasicController{
         ordersDetail.setKind(collaboratorProductCheck.getKind());
         ordersDetail.setValue(collaboratorProductCheck.getValue());
         if(collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_PERCENT)){
-            return  (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
+            double percentComission = collaboratorProductCheck.getValue()/100;    // phần trăm nhận được
+            double comssionPerProduct = productPrice * percentComission;    // tiền nhận được ở mỗi sản phẩm
+            return  (comssionPerProduct * ordersDetail.getAmount());        // tổng tiền nhận được bằng tiền nhận mỗi sản phẩm nhân số lượng
         }
         else if (collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_DOLLAR)){
             return collaboratorProductCheck.getValue() * ordersDetail.getAmount();
@@ -165,36 +273,6 @@ public class OrdersController extends ABasicController{
         return null;
     }
 
-    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
-        if(!isAdmin()){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
-        }
-        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        List<OrdersDetail> ordersDetailList = ordersDetailMapper
-                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
-        Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
-        setCustomerCreateForm(orders,createOrdersForm);
-        Integer checkSaleOff = createOrdersForm.getSaleOff();
-        if(!(checkSaleOff >= LandingISConstant.MIN_OF_PERCENT) || !(checkSaleOff <= LandingISConstant.MAX_OF_PERCENT)){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
-        }
-        Long checkAccount = getCurrentUserId();
-        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
-        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
-        validateCollaboratorAndEmployee(checkCollaborator,checkEmployee, ordersDetailList,orders);
-        orders.setCode(generateCode());
-        Orders savedOrder = ordersRepository.save(orders);
-        /*-----------------------Xử lý orders detail------------------ */
-        amountPriceCal(orders,ordersDetailList,checkCollaborator,savedOrder);  //Tổng tiền hóa đơn
-        ordersDetailRepository.saveAll(ordersDetailList);
-        /*-----------------------Quay lại xử lý orders------------------ */
-
-        ordersRepository.save(orders);
-        apiMessageDto.setMessage("Create orders success");
-        return apiMessageDto;
-    }
 
 
     private void amountPriceCal(Orders orders,List<OrdersDetail> ordersDetailList,Collaborator checkCollaborator, Orders savedOrder) {
@@ -207,7 +285,7 @@ public class OrdersController extends ABasicController{
                 throw new RequestException(ErrorCode.PRODUCT_ERROR_NOT_FOUND, "product in index "+checkIndex+"is not existed");
             }
             Double productPrice = productCheck.getPrice();
-            Double priceProductAfterSale = productPrice - (productPrice * productCheck.getSaleoff()/100);
+            Double priceProductAfterSale = productPrice - (productPrice * productCheck.getSaleoff() / 100);
             ordersDetail.setPrice(priceProductAfterSale);
             amountPrice = amountPrice + priceProductAfterSale * (ordersDetail.getAmount()); // Tổng tiền hóa đơn
             if(checkCollaborator != null){
@@ -230,93 +308,35 @@ public class OrdersController extends ABasicController{
         return Math.round(amountPrice * 100.0) / 100.0;          // Làm tròn đến thập phân thứ 2
     }
 
-    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ApiMessageDto<String> update(@Valid @RequestBody UpdateOrdersForm updateOrdersForm, BindingResult bindingResult) {
-        if(!isAdmin()){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to update.");
+
+
+    private List<OrdersDetail> setDeleteList(UpdateOrdersForm updateOrdersForm) {
+        if(updateOrdersForm.getDeleteOrdersDetailFormList() == null){
+            return Collections.emptyList();
         }
-        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        // Lúc này orders sẽ là orders đang trong database (orders cũ)
-        Orders orders = ordersRepository.findById(updateOrdersForm.getId()).orElse(null);
-        if(orders == null){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
+        int checkIndex = 0;
+        List<OrdersDetail> ordersDetailDeleteList = new ArrayList<>();
+        for (DeleteOrdersDetailForm deleteOrdersDetailForm : updateOrdersForm.getDeleteOrdersDetailFormList()){
+            OrdersDetail ordersDetail = ordersDetailRepository.findById(deleteOrdersDetailForm.getOrderDetailId()).orElse(null);
+            if(ordersDetail == null){
+                throw new RequestException(ErrorCode.ORDERS_DETAIL_ERROR_NOT_FOUND, "Not found orders detail in index " + checkIndex);
+            }
+            ordersDetailDeleteList.add(ordersDetail);
+            checkIndex ++;
         }
-        if(!orders.getState().equals(LandingISConstant.ORDERS_STATE_CREATED)){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update info in this state");
-        }
-        setCustomerUpdateForm(updateOrdersForm, orders);
-        checkSizeProducts(updateOrdersForm);
-        /*List<OrdersDetail> ordersDetailList = ordersDetailRepository.findAllByOrderId(orders.getId());*/
-        //Map update form vô orders --> orders lúc này là orders mới với thông tin mới
-        ordersMapper.fromUpdateOrdersFormToEntity(updateOrdersForm,orders);
-        List<OrdersDetail> ordersDetailDeleteList = ordersDetailMapper
-                .fromDeleteOrdersDetailFormListToOrdersDetailList(updateOrdersForm.getDeleteOrdersDetailFormList());
-        List<OrdersDetail> ordersDetailUpdateList = ordersDetailMapper
-                .fromUpdateOrdersDetailFormListToOrdersDetailList(updateOrdersForm.getUpdateOrdersDetailFormList());
-        if(ordersDetailUpdateList != null && ordersDetailDeleteList != null){
-            checkSameProduct(ordersDetailUpdateList,ordersDetailDeleteList);
-        }
-        if(ordersDetailDeleteList != null){
-            checkProducts(orders.getId(),ordersDetailDeleteList);
-            ordersDetailRepository.deleteAll(ordersDetailDeleteList);
-        }
-        if(ordersDetailUpdateList != null){
-            checkProducts(orders.getId(),ordersDetailUpdateList);
-            amountPriceCal(orders,ordersDetailUpdateList,orders.getCollaborator(),orders);
-            ordersDetailRepository.saveAll(ordersDetailUpdateList);
-        }
-        /*updateOrdersDetailList(orders,ordersDetailList,ordersDetailUpdateList,ordersDetailDeleteList);*/
-        ordersRepository.save(orders);
-        apiMessageDto.setMessage("Update orders success");
-        return apiMessageDto;
+        return ordersDetailDeleteList;
     }
 
 
-
-        private void checkSameProduct(List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
+    private void checkSameProduct(List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
         int checkIndex = 0;
         for(OrdersDetail ordersDetail : ordersDetailDeleteList){
             if (ordersDetailUpdateList.contains(ordersDetail)){
                 throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Product in index "+ checkIndex +"can not be same");
             }
-            checkIndex++;
+            checkIndex ++;
         }
     }
-
-    @PutMapping(value = "/update-state", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ApiMessageDto<String> update(@Valid @RequestBody UpdateStateOrdersForm updateStateOrdersForm, BindingResult bindingResult) {
-        if (!isAdmin()) {
-            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to update.");
-        }
-        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        Orders orders = ordersRepository.findById(updateStateOrdersForm.getId()).orElse(null);
-        if(orders == null){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
-        }
-        checkNewState(updateStateOrdersForm,orders);
-        Integer prevState = orders.getState();
-        ordersMapper.fromUpdateStateOrdersFormToEntity(updateStateOrdersForm,orders);
-        orders.setPrevState(prevState);
-        ordersRepository.save(orders);
-        apiMessageDto.setMessage("Update orders state success");
-        return apiMessageDto;
-    }
-
-
-    /*private void updateOrdersDetailList(Orders orders,List<OrdersDetail> ordersDetailList, List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
-        for (OrdersDetail ordersDetail : ordersDetailUpdateList){
-            OrdersDetail ordersDetailCheck = ordersDetailRepository.findByProductIdAndOrdersId(ordersDetail.getProduct().getId(),orders.getId());
-            int index = ordersDetailList.indexOf(ordersDetailCheck);
-            ordersDetailCheck.setAmount(ordersDetail.getAmount());
-            ordersDetailList.set(index,ordersDetailCheck);
-        }
-        for (OrdersDetail ordersDetail : ordersDetailDeleteList){
-            OrdersDetail ordersDetailCheck = ordersDetailRepository.findByProductIdAndOrdersId(ordersDetail.getProduct().getId(),orders.getId());
-            ordersDetailList.remove(ordersDetailCheck);
-        }
-    }*/
 
     private void checkProducts(Long ordersId ,List<OrdersDetail> ordersDetailList) {
         int checkIndex = 0;
@@ -348,15 +368,13 @@ public class OrdersController extends ABasicController{
 
     private void checkNewState(UpdateStateOrdersForm updateStateOrdersForm,Orders orders) {
         // state mới phải lớn hơn state cũ
-        if(!(updateStateOrdersForm.getState() > orders.getState())){
+        if((updateStateOrdersForm.getState() <= orders.getState())){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Update orders state must mor than or equal old state");
         }
         // State 3 4 không thể update
         Integer state = orders.getState();
         if(state.equals(LandingISConstant.ORDERS_STATE_DONE) || state.equals(LandingISConstant.ORDERS_STATE_CANCELED)){
-            if(!updateStateOrdersForm.getState().equals(orders.getState())){
-                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update orders in state 3 or 4");
-            }
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update orders in state 3 or 4");
         }
     }
 
@@ -378,6 +396,19 @@ public class OrdersController extends ABasicController{
         }
         else{
             orders.setCustomer(customerCheck);
+        }
+    }
+    private String generateCode() {
+        String code = StringUtils.generateRandomString(8);
+        code = code.replace("0", "A");
+        code = code.replace("O", "Z");
+        return code;
+    }
+
+    private void checkState(Orders orders) {
+        Integer state = orders.getState();
+        if(state.equals(LandingISConstant.ORDERS_STATE_DONE) || state.equals(LandingISConstant.ORDERS_STATE_CANCELED)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not cancel order in this state");
         }
     }
 }

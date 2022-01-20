@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 @Data
 public class DeleteOrdersDetailForm {
-    @NotNull(message = "productId cannot be null")
+    @NotNull(message = "orderDetailId cannot be null")
     @ApiModelProperty(required = true)
-    private Long productId;
+    private Long orderDetailId;
 }

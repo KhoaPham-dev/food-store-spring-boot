@@ -41,12 +41,6 @@ public interface OrdersMapper {
     void fromUpdateOrdersFormToEntity(UpdateOrdersForm updateOrdersForm, @MappingTarget Orders orders);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "state", target = "state")
-    @BeanMapping(ignoreByDefault = true)
-    @Named("adminUpdateMapping")
-    void fromUpdateStateOrdersFormToEntity(UpdateStateOrdersForm updateStateOrdersForm, @MappingTarget Orders orders);
-
-    @Mapping(source = "id", target = "id")
     @Mapping(source = "customer", target = "customerDto",qualifiedByName="customerAutoCompleteMapping")
     @Mapping(source = "saleOff", target = "saleOff")
     @Mapping(source = "totalMoney", target = "totalMoney")
