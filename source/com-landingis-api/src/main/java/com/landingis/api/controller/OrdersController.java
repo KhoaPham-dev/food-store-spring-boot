@@ -9,6 +9,7 @@ import com.landingis.api.dto.orders.OrdersDto;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.orders.CreateOrdersForm;
 import com.landingis.api.form.orders.UpdateOrdersForm;
+import com.landingis.api.form.orders.UpdateStateOrdersForm;
 import com.landingis.api.mapper.OrdersDetailMapper;
 import com.landingis.api.mapper.OrdersMapper;
 import com.landingis.api.service.LandingIsApiService;
@@ -276,6 +277,27 @@ public class OrdersController extends ABasicController{
         }
     }
 
+    @PutMapping(value = "/update-state", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> update(@Valid @RequestBody UpdateStateOrdersForm updateStateOrdersForm, BindingResult bindingResult) {
+        if (!isAdmin()) {
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to update.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        Orders orders = ordersRepository.findById(updateStateOrdersForm.getId()).orElse(null);
+        if(orders == null){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
+        }
+        checkNewState(updateStateOrdersForm,orders);
+        Integer prevState = orders.getState();
+        ordersMapper.fromUpdateStateOrdersFormToEntity(updateStateOrdersForm,orders);
+        orders.setPrevState(prevState);
+        ordersRepository.save(orders);
+        apiMessageDto.setMessage("Update orders state success");
+        return apiMessageDto;
+    }
+
+
     /*private void updateOrdersDetailList(Orders orders,List<OrdersDetail> ordersDetailList, List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
         for (OrdersDetail ordersDetail : ordersDetailUpdateList){
             OrdersDetail ordersDetailCheck = ordersDetailRepository.findByProductIdAndOrdersId(ordersDetail.getProduct().getId(),orders.getId());
@@ -317,19 +339,19 @@ public class OrdersController extends ABasicController{
         }
     }
 
-    /*private void checkNewState(UpdateOrdersForm updateOrdersForm,Orders orders) {
-        // state mới phải lớn hơn hoặc bằng state cũ
-        if(updateOrdersForm.getState() < orders.getState()){
+    private void checkNewState(UpdateStateOrdersForm updateStateOrdersForm,Orders orders) {
+        // state mới phải lớn hơn state cũ
+        if(!(updateStateOrdersForm.getState() > orders.getState())){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Update orders state must mor than or equal old state");
         }
         // State 3 4 không thể update
         Integer state = orders.getState();
         if(state.equals(LandingISConstant.ORDERS_STATE_DONE) || state.equals(LandingISConstant.ORDERS_STATE_CANCELED)){
-            if(!updateOrdersForm.getState().equals(orders.getState())){
-                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "State 3 4 can not be updated");
+            if(!updateStateOrdersForm.getState().equals(orders.getState())){
+                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update orders in state 3 or 4");
             }
         }
-    }*/
+    }
 
     private void setCustomerUpdateForm(UpdateOrdersForm updateOrdersForm, Orders orders) {
         Customer customerCheck = customerRepository.findByPhone(updateOrdersForm.getReceiverPhone());

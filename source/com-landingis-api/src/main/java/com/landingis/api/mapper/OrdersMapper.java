@@ -7,6 +7,7 @@ import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.employee.UpdateEmployeeForm;
 import com.landingis.api.form.orders.CreateOrdersForm;
 import com.landingis.api.form.orders.UpdateOrdersForm;
+import com.landingis.api.form.orders.UpdateStateOrdersForm;
 import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.Employee;
 import com.landingis.api.storage.model.Orders;
@@ -39,6 +40,11 @@ public interface OrdersMapper {
     @Named("adminUpdateMapping")
     void fromUpdateOrdersFormToEntity(UpdateOrdersForm updateOrdersForm, @MappingTarget Orders orders);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "state", target = "state")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("adminUpdateMapping")
+    void fromUpdateStateOrdersFormToEntity(UpdateStateOrdersForm updateStateOrdersForm, @MappingTarget Orders orders);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "customer", target = "customerDto",qualifiedByName="customerAutoCompleteMapping")
