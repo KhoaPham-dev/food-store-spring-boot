@@ -143,6 +143,21 @@ public class OrdersController extends ABasicController{
         }
     }
 
+
+    private Double amountComission(OrdersDetail ordersDetail, Double productPrice, Collaborator checkCollaborator) {
+        CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository
+                .findByCollaboratorIdAndProductId(checkCollaborator.getId(),ordersDetail.getProduct().getId());
+        ordersDetail.setKind(collaboratorProductCheck.getKind());
+        ordersDetail.setValue(collaboratorProductCheck.getValue());
+        if(collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_PERCENT)){
+            return  (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
+        }
+        else if (collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_DOLLAR)){
+            return collaboratorProductCheck.getValue() * ordersDetail.getAmount();
+        }
+        return null;
+    }
+
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
@@ -179,16 +194,7 @@ public class OrdersController extends ABasicController{
             ordersDetail.setPrice(priceProductAfterSale);
             amountPrice = amountPrice + priceProductAfterSale * (ordersDetail.getAmount()); // Tổng tiền hóa đơn
             if(checkCollaborator != null){
-                CollaboratorProduct collaboratorProductCheck = collaboratorProductRepository
-                        .findByCollaboratorIdAndProductId(checkCollaborator.getId(),ordersDetail.getProduct().getId());
-                ordersDetail.setKind(collaboratorProductCheck.getKind());
-                ordersDetail.setValue(collaboratorProductCheck.getValue());
-                if(collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_PERCENT)){
-                    collaboratorCommission = (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
-                }
-                else if (collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_DOLLAR)){
-                    collaboratorCommission = collaboratorProductCheck.getValue() * ordersDetail.getAmount();
-                }
+                collaboratorCommission = amountComission(ordersDetail,productPrice,checkCollaborator);
             }
             ordersDetail.setCollaboratorCommission(collaboratorCommission);
             ordersDetail.setOrders(savedOrder);
