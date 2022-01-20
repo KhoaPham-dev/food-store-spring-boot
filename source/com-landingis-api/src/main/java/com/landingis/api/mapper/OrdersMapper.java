@@ -31,7 +31,6 @@ public interface OrdersMapper {
     Orders fromCreateOrdersFormToEntity(CreateOrdersForm createOrdersForm);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "state", target = "state")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "receiverName", target = "receiverName")
     @Mapping(source = "receiverPhone", target = "receiverPhone")

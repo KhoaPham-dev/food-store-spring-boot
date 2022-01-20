@@ -234,16 +234,14 @@ public class OrdersController extends ABasicController{
         if(orders == null){
             throw new RequestException(ErrorCode.ORDERS_ERROR_NOT_FOUND, "Orders Not Found");
         }
+        if(!orders.getState().equals(LandingISConstant.ORDERS_STATE_CREATED)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Can not update info in this state");
+        }
         setCustomerUpdateForm(updateOrdersForm, orders);
-        checkNewState(updateOrdersForm,orders);
-        Integer prevState = orders.getState();
         checkSizeProducts(updateOrdersForm);
         /*List<OrdersDetail> ordersDetailList = ordersDetailRepository.findAllByOrderId(orders.getId());*/
         //Map update form vô orders --> orders lúc này là orders mới với thông tin mới
         ordersMapper.fromUpdateOrdersFormToEntity(updateOrdersForm,orders);
-        if(prevState != orders.getState()){
-            orders.setPrevState(prevState);
-        }
         List<OrdersDetail> ordersDetailDeleteList = ordersDetailMapper
                 .fromDeleteOrdersDetailFormListToOrdersDetailList(updateOrdersForm.getDeleteOrdersDetailFormList());
         List<OrdersDetail> ordersDetailUpdateList = ordersDetailMapper
@@ -266,7 +264,9 @@ public class OrdersController extends ABasicController{
         return apiMessageDto;
     }
 
-    private void checkSameProduct(List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
+
+
+        private void checkSameProduct(List<OrdersDetail> ordersDetailUpdateList, List<OrdersDetail> ordersDetailDeleteList) {
         int checkIndex = 0;
         for(OrdersDetail ordersDetail : ordersDetailDeleteList){
             if (ordersDetailUpdateList.contains(ordersDetail)){
@@ -293,11 +293,11 @@ public class OrdersController extends ABasicController{
         int checkIndex = 0;
         for (OrdersDetail ordersDetail : ordersDetailList){
             OrdersDetail ordersDetailCheck = ordersDetailRepository.findByProductIdAndOrdersId(ordersDetail.getProduct().getId(),ordersId);
-            ordersDetailCheck.setAmount(ordersDetail.getAmount());
-            ordersDetailList.set(checkIndex,ordersDetailCheck);
             if(ordersDetailCheck == null){
                 throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Product in index "+ checkIndex +"not have in orders");
             }
+            ordersDetailCheck.setAmount(ordersDetail.getAmount());
+            ordersDetailList.set(checkIndex,ordersDetailCheck);
             checkIndex++;
         }
     }
@@ -317,47 +317,38 @@ public class OrdersController extends ABasicController{
         }
     }
 
-    private void checkNewState(UpdateOrdersForm updateOrdersForm,Orders orders) {
+    /*private void checkNewState(UpdateOrdersForm updateOrdersForm,Orders orders) {
         // state mới phải lớn hơn hoặc bằng state cũ
         if(updateOrdersForm.getState() < orders.getState()){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Update orders state must mor than or equal old state");
         }
         // State 3 4 không thể update
-        if(orders.getState().equals(LandingISConstant.ORDERS_STATE_DONE)
-            ||orders.getState().equals(LandingISConstant.ORDERS_STATE_CANCELED)){
+        Integer state = orders.getState();
+        if(state.equals(LandingISConstant.ORDERS_STATE_DONE) || state.equals(LandingISConstant.ORDERS_STATE_CANCELED)){
             if(!updateOrdersForm.getState().equals(orders.getState())){
                 throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "State 3 4 can not be updated");
             }
         }
-    }
+    }*/
 
     private void setCustomerUpdateForm(UpdateOrdersForm updateOrdersForm, Orders orders) {
         Customer customerCheck = customerRepository.findByPhone(updateOrdersForm.getReceiverPhone());
-        if(orders.getState().equals(LandingISConstant.ORDERS_STATE_CREATED)){
-            if (customerCheck == null) {
-                {
-                    Account savedAccount = new Account();
-                    savedAccount.setPhone(updateOrdersForm.getReceiverPhone());
-                    savedAccount.setFullName(updateOrdersForm.getReceiverName());
-                    savedAccount.setKind(LandingISConstant.USER_KIND_CUSTOMER);
+        if (customerCheck == null) {
+            {
+                Account savedAccount = new Account();
+                savedAccount.setPhone(updateOrdersForm.getReceiverPhone());
+                savedAccount.setFullName(updateOrdersForm.getReceiverName());
+                savedAccount.setKind(LandingISConstant.USER_KIND_CUSTOMER);
 
-                    Customer savedCustomer = new Customer();
-                    savedCustomer.setAccount(savedAccount);
-                    savedCustomer.setAddress(updateOrdersForm.getAddress());
-                    savedCustomer = customerRepository.save(savedCustomer);
-                    orders.setCustomer(savedCustomer);
-                }
-            }
-            else if(customerCheck != null){
-                orders.setCustomer(customerCheck);
+                Customer savedCustomer = new Customer();
+                savedCustomer.setAccount(savedAccount);
+                savedCustomer.setAddress(updateOrdersForm.getAddress());
+                savedCustomer = customerRepository.save(savedCustomer);
+                orders.setCustomer(savedCustomer);
             }
         }
         else{
-            // Nếu state khác 0, kiểm tra customer của phone nhập vào có giống customer của orders đã tạo ko
-            if(customerCheck != orders.getCustomer()){
-                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "Orders is not in state 0 to update info");
-            }
+            orders.setCustomer(customerCheck);
         }
-
     }
 }
