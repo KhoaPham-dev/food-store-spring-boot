@@ -13,7 +13,7 @@ public class News extends Auditable<String>{
     private Long id;
     private String title;
 
-    @Column(name = "content", columnDefinition = "LONGTEXT")
+    @Column(name = "content", columnDefinition = "TEXT", length=10485760)
     private String content;
     private String avatar;
     private String banner;
