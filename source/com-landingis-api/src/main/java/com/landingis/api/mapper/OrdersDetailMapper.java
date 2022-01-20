@@ -2,8 +2,8 @@ package com.landingis.api.mapper;
 
 import com.landingis.api.dto.orders.OrdersDetailDto;
 import com.landingis.api.dto.orders.OrdersDto;
-import com.landingis.api.form.orders.CreateOrdersDetailForm;
-import com.landingis.api.form.orders.CreateOrdersForm;
+import com.landingis.api.form.orders.*;
+import com.landingis.api.storage.model.Employee;
 import com.landingis.api.storage.model.Orders;
 import com.landingis.api.storage.model.OrdersDetail;
 import org.mapstruct.*;
@@ -24,6 +24,25 @@ public interface OrdersDetailMapper {
 
     @IterableMapping(elementTargetType = OrdersDetail.class, qualifiedByName = "adminCreateMapping")
     List<OrdersDetail> fromCreateOrdersDetailFormListToOrdersDetailList(List<CreateOrdersDetailForm> createOrdersDetailFormList);
+
+    @Mapping(source = "productId", target = "product.id")
+    @Mapping(source = "amount", target = "amount")
+    @Mapping(source = "note", target = "note")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("adminUpdateMapping")
+    OrdersDetail fromUpdateOrdersDetailFormToEntity(UpdateOrdersDetailForm updateOrdersDetailForm);
+
+    @IterableMapping(elementTargetType = OrdersDetail.class, qualifiedByName = "adminUpdateMapping")
+    List<OrdersDetail> fromUpdateOrdersDetailFormListToOrdersDetailList(List<UpdateOrdersDetailForm> updateOrdersDetailFormList);
+
+    @Mapping(source = "productId", target = "product.id")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("adminDeleteMapping")
+    OrdersDetail fromDeleteOrdersDetailFormToEntity(DeleteOrdersDetailForm deleteOrdersDetailForm);
+
+    @IterableMapping(elementTargetType = OrdersDetail.class, qualifiedByName = "adminDeleteMapping")
+    List<OrdersDetail> fromDeleteOrdersDetailFormListToOrdersDetailList(List<DeleteOrdersDetailForm> deleteOrdersDetailFormList);
+
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "orders", target = "ordersDto",qualifiedByName = "ordersAutoCompleteMapping")

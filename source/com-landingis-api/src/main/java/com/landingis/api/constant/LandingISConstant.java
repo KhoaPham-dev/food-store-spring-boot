@@ -51,6 +51,8 @@ public class LandingISConstant {
     public static final Integer ORDERS_STATE_DONE = 3;
     public static final Integer ORDERS_STATE_CANCELED = 4;
 
+    public static final Integer MIN_OF_AMOUNT = 0;
+
     public static final Integer PAYMENT_METHOD_COD = 1;
     public static final Integer PAYMENT_METHOD_ONLINE = 2;
 

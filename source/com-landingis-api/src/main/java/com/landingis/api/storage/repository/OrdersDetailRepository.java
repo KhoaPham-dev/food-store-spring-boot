@@ -11,4 +11,10 @@ import java.util.List;
 public interface OrdersDetailRepository extends JpaRepository<OrdersDetail, Long>, JpaSpecificationExecutor<OrdersDetail> {
     @Query("SELECT o FROM OrdersDetail o WHERE o.orders.id = ?1")
     List<OrdersDetail> findAllByOrderId(Long id);
+
+    @Query("SELECT COUNT(o) FROM OrdersDetail o WHERE o.orders.id = ?1")
+    int countByOrdersId(Long id);
+
+    @Query("SELECT o FROM OrdersDetail o WHERE o.orders.id = ?2 AND o.product.id = ?1")
+    OrdersDetail findByProductIdAndOrdersId(Long productId, Long ordersId);
 }
