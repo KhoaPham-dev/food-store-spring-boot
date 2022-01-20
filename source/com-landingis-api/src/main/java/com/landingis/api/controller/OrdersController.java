@@ -217,10 +217,17 @@ public class OrdersController extends ABasicController{
             ordersDetail.setOrders(savedOrder);
             checkIndex++;
         }
-        amountPrice = (amountPrice*(1 - (double)orders.getSaleOff()/100))*(1 + (double)LandingISConstant.ORDER_VAT/100);
-        amountPrice = Math.round(amountPrice*100.0)/100.0; // Làm tròn đến thập phân thứ 2
-        orders.setTotalMoney(amountPrice);
+        Double totalMoney = totalMoneyHaveToPay(amountPrice,orders);
+        orders.setTotalMoney(totalMoney);
         orders.setVat(LandingISConstant.ORDER_VAT);
+    }
+
+    private Double totalMoneyHaveToPay(Double amountPrice,Orders orders) {
+        double saleOff = (double)orders.getSaleOff() / 100;             // Tính saleOff (%)
+        Double amountAfterSaleOff =  amountPrice - amountPrice * saleOff;                  // Tổng tiền sau khi trừ saleOff
+        double VAT = (double)LandingISConstant.ORDER_VAT / 100;             // Tính VAT (%)
+        amountPrice = amountAfterSaleOff + amountAfterSaleOff * VAT ;              // Tiền sau cùng bằng tiền sau khi saleOff cộng với VAT (10% tổng tiền)
+        return Math.round(amountPrice * 100.0) / 100.0;          // Làm tròn đến thập phân thứ 2
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
