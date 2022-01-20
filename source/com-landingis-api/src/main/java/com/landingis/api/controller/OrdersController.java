@@ -4,17 +4,13 @@ import com.landingis.api.constant.LandingISConstant;
 import com.landingis.api.dto.ApiMessageDto;
 import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
-import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.orders.OrdersDetailDto;
 import com.landingis.api.dto.orders.OrdersDto;
 import com.landingis.api.exception.RequestException;
-import com.landingis.api.form.employee.CreateEmployeeForm;
 import com.landingis.api.form.orders.CreateOrdersForm;
-import com.landingis.api.mapper.EmployeeMapper;
 import com.landingis.api.mapper.OrdersDetailMapper;
 import com.landingis.api.mapper.OrdersMapper;
 import com.landingis.api.service.LandingIsApiService;
-import com.landingis.api.storage.criteria.EmployeeCriteria;
 import com.landingis.api.storage.criteria.OrdersCriteria;
 import com.landingis.api.storage.model.*;
 import com.landingis.api.storage.repository.*;
@@ -113,18 +109,7 @@ public class OrdersController extends ABasicController{
         result.setMessage("Get orders success");
         return result;
     }
-
-
-    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
-        if(!isAdmin()){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
-        }
-        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
-        List<OrdersDetail> ordersDetailList = ordersDetailMapper
-                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
-        Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
+    private void setCustomer(Orders orders, CreateOrdersForm createOrdersForm) {
         Customer customerCheck = customerRepository.findByPhone(createOrdersForm.getReceiverPhone());
         if (customerCheck == null) {
             Customer savedCustomer = new Customer();
@@ -138,13 +123,9 @@ public class OrdersController extends ABasicController{
         else{
             orders.setCustomer(customerCheck);
         }
-        Integer checkSaleOff = createOrdersForm.getSaleOff();
-        if(!(checkSaleOff >= LandingISConstant.MIN_OF_PERCENT) || !(checkSaleOff <= LandingISConstant.MAX_OF_PERCENT)){
-            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
-        }
-        Long checkAccount = getCurrentUserId();
-        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
-        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
+    }
+
+    private void validateCollaboratorAndEmployee(Collaborator checkCollaborator, Employee checkEmployee , List<OrdersDetail> ordersDetailList, Orders orders) {
         int checkIndex = 0;
         if(checkCollaborator != null){
             orders.setEmployee(checkCollaborator.getEmployee());
@@ -160,12 +141,33 @@ public class OrdersController extends ABasicController{
         if(checkEmployee != null){
             orders.setEmployee(checkEmployee);
         }
+    }
+
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
+        if(!isAdmin()){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        List<OrdersDetail> ordersDetailList = ordersDetailMapper
+                .fromCreateOrdersDetailFormListToOrdersDetailList(createOrdersForm.getCreateOrdersDetailFormList());
+        Orders orders = ordersMapper.fromCreateOrdersFormToEntity(createOrdersForm);
+        setCustomer(orders,createOrdersForm);
+        Integer checkSaleOff = createOrdersForm.getSaleOff();
+        if(!(checkSaleOff >= LandingISConstant.MIN_OF_PERCENT) || !(checkSaleOff <= LandingISConstant.MAX_OF_PERCENT)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
+        }
+        Long checkAccount = getCurrentUserId();
+        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
+        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
+        validateCollaboratorAndEmployee(checkCollaborator,checkEmployee, ordersDetailList,orders);
         orders.setCode(generateCode());
         Orders savedOrder = ordersRepository.save(orders);
         /*-----------------------Xử lý orders detail------------------ */
         Double amountPrice = 0.0;  //Tổng tiền hóa đơn
 
-        checkIndex = 0;
+        int checkIndex = 0;
         for (OrdersDetail ordersDetail : ordersDetailList){
             Double collaboratorCommission = null;
             Product productCheck = productRepository.findById(ordersDetail.getProduct().getId()).orElse(null);
@@ -181,10 +183,10 @@ public class OrdersController extends ABasicController{
                         .findByCollaboratorIdAndProductId(checkCollaborator.getId(),ordersDetail.getProduct().getId());
                 ordersDetail.setKind(collaboratorProductCheck.getKind());
                 ordersDetail.setValue(collaboratorProductCheck.getValue());
-                if(collaboratorProductCheck.getKind() == LandingISConstant.COLLABORATOR_KIND_PERCENT){
+                if(collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_PERCENT)){
                     collaboratorCommission = (productPrice * collaboratorProductCheck.getValue()/100) * ordersDetail.getAmount();
                 }
-                else if (collaboratorProductCheck.getKind() == LandingISConstant.COLLABORATOR_KIND_DOLLAR){
+                else if (collaboratorProductCheck.getKind().equals(LandingISConstant.COLLABORATOR_KIND_DOLLAR)){
                     collaboratorCommission = collaboratorProductCheck.getValue() * ordersDetail.getAmount();
                 }
             }
