@@ -89,7 +89,10 @@ public class SettingsController extends ABasicController{
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         // Đảm bảo key nhập vào không có khoảng trắng
-        checkKey(createSettingsForm);
+        String key = createSettingsForm.getKey();
+        if (key.contains(" ")) {
+            throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "Key can not have whitespace");
+        }
 
         // check unique bằng key
         Settings settings = settingsRepository.findByKey(createSettingsForm.getKey());
@@ -101,13 +104,6 @@ public class SettingsController extends ABasicController{
         settingsRepository.save(settings);
         apiMessageDto.setMessage("Create settings success");
         return apiMessageDto;
-    }
-
-    private void checkKey(CreateSettingsForm createSettingsForm) {
-        String key = createSettingsForm.getKey();
-        if (key.contains(" ")) {
-            throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "Key can not have whitespace");
-        }
     }
 
     private void checkGroup(CreateSettingsForm createSettingsForm) {
@@ -136,19 +132,14 @@ public class SettingsController extends ABasicController{
         if(settings == null || !settings.getStatus().equals(LandingISConstant.STATUS_ACTIVE)) {
             throw new RequestException(ErrorCode.SETTINGS_ERROR_NOT_FOUND, "Not found settings.");
         }
-        checkEditable(settings);
+        if(!settings.isEditable()){
+            throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "This settings can not edit");
+        }
         settingsMapper.fromUpdateSettingsFormToEntity(updateSettingsForm,settings);
         settingsRepository.save(settings);
         apiMessageDto.setMessage("Update settings success");
         return apiMessageDto;
     }
-
-    private void checkEditable(Settings settings) {
-        if(!settings.isEditable()){
-            throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "This settings can not edit");
-        }
-    }
-
     @DeleteMapping(value = "/delete/{id}")
     public ApiMessageDto<SettingsDto> delete(@PathVariable("id") Long id) {
         if(!isAdmin()){
