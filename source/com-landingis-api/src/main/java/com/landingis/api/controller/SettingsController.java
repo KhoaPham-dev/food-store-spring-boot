@@ -99,7 +99,7 @@ public class SettingsController extends ABasicController{
         checkGroup(createSettingsForm);
         settings = settingsMapper.fromCreateSettingsFormToEntity(createSettingsForm);
         settingsRepository.save(settings);
-        apiMessageDto.setMessage("Create category success");
+        apiMessageDto.setMessage("Create settings success");
         return apiMessageDto;
     }
 
