@@ -1,0 +1,12 @@
+diff a/.gitignore b/.gitignore	(rejected hunks)
+@@ -20,8 +20,9 @@
+ *.jar
+ 
+ # Maven
+-target/
++**/target/*
+ dist/
++!**/target/*.jar
+ 
+ # JetBrains IDE
+ .idea/
