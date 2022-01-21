@@ -1,1 +1,0 @@
-web: java $JAVA_OPTS -jar -Dserver.port=$PORT source/com-landingis-api/target/com-landingis-api-spring-boot.jar

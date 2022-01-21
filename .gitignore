@@ -20,9 +20,8 @@ dist/
 *.jar
 
 # Maven
-**/target/*
+target/
 dist/
-!**/target/*.jar
 
 # JetBrains IDE
 .idea/
