@@ -1,14 +1,8 @@
 package com.landingis.api.form.orders;
-
-import com.landingis.api.storage.model.Collaborator;
-import com.landingis.api.storage.model.Employee;
-import com.landingis.api.storage.model.OrdersDetail;
-import com.landingis.api.validation.OrdersState;
 import com.landingis.api.validation.PaymentMethod;
 import com.landingis.api.validation.Status;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.core.annotation.Order;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -19,14 +13,6 @@ public class CreateOrdersForm {
     @NotNull(message = "saleOff cannot be null")
     @ApiModelProperty(required = true)
     private Integer saleOff;
-
-    @OrdersState
-    @NotNull(message = "state cannot be null")
-    @ApiModelProperty(required = true)
-    private Integer state;
-
-    @OrdersState
-    private Integer prevState;
 
     @NotEmpty(message = "address cannot be empty")
     @ApiModelProperty(required = true)

@@ -130,6 +130,7 @@ public class OrdersController extends ABasicController{
         Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
         validateCollaboratorAndEmployee(checkCollaborator,checkEmployee, ordersDetailList,orders);
         orders.setCode(generateCode());
+        orders.setState(LandingISConstant.ORDERS_STATE_CREATED);
         Orders savedOrder = ordersRepository.save(orders);
         /*-----------------------Xử lý orders detail------------------ */
         amountPriceCal(orders,ordersDetailList,checkCollaborator,savedOrder);  //Tổng tiền hóa đơn
