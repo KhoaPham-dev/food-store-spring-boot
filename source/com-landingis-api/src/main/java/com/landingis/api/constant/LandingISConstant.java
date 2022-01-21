@@ -29,12 +29,25 @@ public class LandingISConstant {
     public static final Integer MIN_OF_PERCENT = 0;
     public static final Integer MAX_OF_PERCENT = 100;
 
+    public static final Integer SETTINGS_GROUP_TYPE_NUMBER = 0;
+    public static final Integer SETTINGS_GROUP_TYPE_NAME = 1;
+
     public static final Integer MIN_PRICE = 0;
 
     public static final Integer CATEGORY_KIND = 1;
 
     public static final Integer COLLABORATOR_KIND_PERCENT = 1;
     public static final Integer COLLABORATOR_KIND_DOLLAR = 2;
+
+    public static final Integer SETTING_GROUP_ID_ADMIN = 1;
+    public static final Integer SETTING_GROUP_ID_CUSTOMER = 2;
+
+    public static final Integer SETTING_KIND_ON_OFF = 1;
+    public static final Integer SETTING_KIND_TEXT = 2;
+    public static final Integer SETTING_KIND_DATE = 3;
+    public static final Integer SETTING_KIND_TIME = 4;
+    public static final Integer SETTING_KIND_TIMESTAMP = 5;
+    public static final Integer SETTING_KIND_UPLOAD = 6;
 
 
     public static final Integer GENDER_MALE = 1;

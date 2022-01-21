@@ -104,5 +104,12 @@ public class ErrorCode {
     public static final String ORDERS_DETAIL_ERROR_NOT_FOUND = "ERROR-DETAIL-ORDERS-001";
     public static final String ORDERS_DETAIL_ERROR_BAD_REQUEST = "ERROR-DETAIL-ORDERS-002";
 
+    /**
+     * Settings error code
+     */
+    public static final String SETTINGS_ERROR_UNAUTHORIZED = "ERROR-SETTINGS-000";
+    public static final String SETTINGS_ERROR_NOT_FOUND = "ERROR-SETTINGS-001";
+    public static final String SETTINGS_ERROR_BAD_REQUEST = "ERROR-SETTINGS-002";
+
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

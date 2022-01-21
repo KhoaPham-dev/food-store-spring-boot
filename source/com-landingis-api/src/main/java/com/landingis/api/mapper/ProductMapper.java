@@ -37,7 +37,7 @@ public interface ProductMapper {
     @Mapping(source = "productPrice", target = "price")
     @Mapping(source = "status", target = "status")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminCreateMapping")
+    @Named("adminUpdateMapping")
     void fromUpdateProductFormToEntity(UpdateProductForm updateProductForm, @MappingTarget Product product);
 
     @Mapping(source = "id", target = "id")
@@ -53,7 +53,7 @@ public interface ProductMapper {
     @Mapping(source = "labelColor", target = "labelColor")
     @Mapping(source = "status", target = "status")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminCreateMapping")
+    @Named("adminGetMapping")
     ProductDto fromEntityToAdminDto(Product product);
 
     List<ProductDto> fromEntityListToProductDtoList(List<Product> products);
