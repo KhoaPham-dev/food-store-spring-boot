@@ -22,10 +22,10 @@ public class Product extends  Auditable<String> {
     private Double price;
     private String image;
 
-    @Column(name = "content", columnDefinition = "LONGTEXT")
+    @Column(name = "content", columnDefinition = "TEXT", length=10485760)
     private String description;
 
-    @Column(name = "short_description", columnDefinition = "TEXT")
+    @Column(name = "short_description", columnDefinition = "TEXT", length=10485760)
     private String shortDescription;
 
     @ManyToOne(fetch = FetchType.LAZY)
