@@ -25,7 +25,7 @@ import java.util.TimeZone;
 @EnableScheduling
 @EnableAspectJAutoProxy
 @Slf4j
-/*@ComponentScan(value = {"com.landingis.api"})*/
+@ComponentScan(value = {"com.landingis.api"})
 public class Application {
 
     @Autowired

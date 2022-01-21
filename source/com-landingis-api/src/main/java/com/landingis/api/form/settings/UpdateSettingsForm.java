@@ -13,10 +13,6 @@ public class UpdateSettingsForm {
     @ApiModelProperty(required = true)
     private Long id;
 
-    @NotEmpty(message = "name cannot be null")
-    @ApiModelProperty(required = true)
-    private String name;
-
     @NotEmpty(message = "value cannot be null")
     @ApiModelProperty(required = true)
     private String value;
@@ -24,10 +20,6 @@ public class UpdateSettingsForm {
     @NotEmpty(message = "description cannot be null")
     @ApiModelProperty(required = true)
     private String description;
-
-    @NotNull(message = "editable cannot be null")
-    @ApiModelProperty(required = true)
-    private boolean editable;
 
     @Status
     @NotNull(message = "status cannot be null")

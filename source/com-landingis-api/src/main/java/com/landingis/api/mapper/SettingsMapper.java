@@ -29,10 +29,8 @@ public interface SettingsMapper {
     Settings fromCreateSettingsFormToEntity(CreateSettingsForm createSettingsForm);
 
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "name", target = "name")
     @Mapping(source = "value", target = "value")
     @Mapping(source = "description", target = "description")
-    @Mapping(source = "editable", target = "editable")
     @Mapping(source = "status", target = "status")
     @BeanMapping(ignoreByDefault = true)
     @Named("adminUpdateMapping")
