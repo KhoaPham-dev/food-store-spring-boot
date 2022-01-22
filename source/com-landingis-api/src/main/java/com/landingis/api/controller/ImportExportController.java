@@ -6,6 +6,7 @@ import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.import_export.ImportExportDto;
+import com.landingis.api.dto.import_export.ResponseListObjImportExport;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.employee.CreateEmployeeForm;
 import com.landingis.api.form.employee.UpdateEmployeeForm;
@@ -29,6 +30,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/v1/import-export")
@@ -48,19 +50,44 @@ public class ImportExportController extends ABasicController{
     LandingIsApiService landingIsApiService;
 
     @GetMapping(value = "/list",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiMessageDto<ResponseListObj<ImportExportDto>> list(ImportExportCriteria importExportCriteria, Pageable pageable){
+    public ApiMessageDto<ResponseListObjImportExport> list(ImportExportCriteria importExportCriteria, Pageable pageable){
         if(!isAdmin()){
             throw new RequestException(ErrorCode.IMPORT_EXPORT_ERROR_UNAUTHORIZED,"Not allowed get list.");
         }
-        ApiMessageDto<ResponseListObj<ImportExportDto>> responseListObjApiMessageDto = new ApiMessageDto<>();
+        ApiMessageDto<ResponseListObjImportExport> responseListObjApiMessageDto = new ApiMessageDto<>();
         Page<ImportExport> listImportExport = importExportRepository.findAll(importExportCriteria.getSpecification(), pageable);
-        ResponseListObj<ImportExportDto> responseListObj = new ResponseListObj<>();
-        responseListObj.setData(importExportMapper.fromEntityListToImportExportDtoList(listImportExport.getContent()));
-        responseListObj.setPage(pageable.getPageNumber());
-        responseListObj.setTotalPage(listImportExport.getTotalPages());
-        responseListObj.setTotalElements(listImportExport.getTotalElements());
+        ResponseListObjImportExport responseListObjImportExport = new ResponseListObjImportExport();
+        responseListObjImportExport.setData(importExportMapper.fromEntityListToImportExportDtoList(listImportExport.getContent()));
+        responseListObjImportExport.setPage(pageable.getPageNumber());
+        responseListObjImportExport.setTotalPage(listImportExport.getTotalPages());
+        responseListObjImportExport.setTotalElements(listImportExport.getTotalElements());
+        Double sum = 0d;
+        Integer importExportKind = importExportCriteria.getKind();
+        if(importExportKind == null || !(importExportKind.equals(LandingISConstant.IMPORT_KIND)
+            && importExportKind.equals(LandingISConstant.EXPORT_KIND))){
+            throw new RequestException(ErrorCode.IMPORT_EXPORT_ERROR_BAD_REQUEST, "Must have kind");
+        }
+        Date importExportTo = importExportCriteria.getTo();
+        Date importExportFrom = importExportCriteria.getFrom();
+        // kind , from ,to
+        if(importExportFrom != null && importExportTo != null){
+            sum = importExportRepository.sumMoneyByKindAndFromAndTo(importExportKind,importExportFrom,importExportTo);
+        }
+        // kind , from
+        if(importExportFrom != null && importExportTo == null){
+            sum = importExportRepository.sumMoneyByKindAndFrom(importExportKind,importExportFrom);
+        }
 
-        responseListObjApiMessageDto.setData(responseListObj);
+        // kind , to
+        if(importExportFrom == null && importExportTo != null){
+            sum = importExportRepository.sumMoneyByKindAndTo(importExportKind,importExportTo);
+        }
+        // kind
+        if(importExportFrom == null && importExportTo == null){
+            sum = importExportRepository.sumMoneyByKind(importExportKind);
+        }
+        responseListObjImportExport.setSum(sum);
+        responseListObjApiMessageDto.setData(responseListObjImportExport);
         responseListObjApiMessageDto.setMessage("Get list success");
         return responseListObjApiMessageDto;
     }
