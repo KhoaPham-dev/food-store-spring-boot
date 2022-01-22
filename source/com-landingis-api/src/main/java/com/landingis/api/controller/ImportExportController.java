@@ -63,8 +63,8 @@ public class ImportExportController extends ABasicController{
         responseListObjImportExport.setTotalElements(listImportExport.getTotalElements());
         Double sum = 0d;
         Integer importExportKind = importExportCriteria.getKind();
-        if(importExportKind == null || !(importExportKind.equals(LandingISConstant.IMPORT_KIND)
-            && importExportKind.equals(LandingISConstant.EXPORT_KIND))){
+        if(importExportKind == null || (!importExportKind.equals(LandingISConstant.IMPORT_KIND)
+            && !importExportKind.equals(LandingISConstant.EXPORT_KIND))){
             throw new RequestException(ErrorCode.IMPORT_EXPORT_ERROR_BAD_REQUEST, "Must have kind");
         }
         Date importExportTo = importExportCriteria.getTo();
