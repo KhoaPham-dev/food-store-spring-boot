@@ -8,12 +8,15 @@ import com.landingis.api.dto.news.NewsDto;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.news.CreateNewsForm;
 import com.landingis.api.form.news.UpdateNewsForm;
+import com.landingis.api.form.product.CreateProductForm;
 import com.landingis.api.mapper.NewsMapper;
 import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.NewsCriteria;
 import com.landingis.api.storage.model.Account;
+import com.landingis.api.storage.model.Category;
 import com.landingis.api.storage.model.News;
 import com.landingis.api.storage.repository.AccountRepository;
+import com.landingis.api.storage.repository.CategoryRepository;
 import com.landingis.api.storage.repository.NewsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +37,9 @@ public class NewsController extends ABasicController{
 
     @Autowired
     NewsRepository newsRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @Autowired
     NewsMapper newsMapper;
@@ -96,10 +102,19 @@ public class NewsController extends ABasicController{
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
 
         News news = newsMapper.fromCreateNewsFormToEntity(createNewsForm);
-
+        checkCategory(createNewsForm);
         newsRepository.save(news);
         apiMessageDto.setMessage("Create news success");
         return apiMessageDto;
+    }
+    private void checkCategory(CreateNewsForm createNewsForm) {
+        Category categoryCheck = categoryRepository.findById(createNewsForm.getCategoryId()).orElse(null);
+        if (categoryCheck == null || categoryCheck.getStatus()==0){
+            throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Category not found");
+        }
+        if(!categoryCheck.getKind().equals(LandingISConstant.CATEGORY_KIND_NEWS_INTERNAL)){
+            throw new RequestException(ErrorCode.CATEGORY_ERROR_BAD_REQUEST, "Category is not news kind");
+        }
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)

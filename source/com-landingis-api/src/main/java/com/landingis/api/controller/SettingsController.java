@@ -112,11 +112,11 @@ public class SettingsController extends ABasicController{
         if(listItem.length != 2){
             throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "Group format is wrong");
         }
-        String groupNumber = listItem[0];
+        String groupNumber = listItem[LandingISConstant.SETTINGS_GROUP_TYPE_NUMBER];
         if(!NumberUtils.isNumber(groupNumber)){
             throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "Group number value is wrong");
         }
-        String groupString = listItem[1];
+        String groupString = listItem[LandingISConstant.SETTINGS_GROUP_TYPE_NAME];
         if(!(groupString.length() > 1 && !groupString.contains(" "))){
             throw new RequestException(ErrorCode.SETTINGS_ERROR_BAD_REQUEST, "Group string value is wrong");
         }

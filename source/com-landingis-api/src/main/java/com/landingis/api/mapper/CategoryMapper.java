@@ -54,9 +54,9 @@ public interface CategoryMapper {
     @Mapping(source = "name", target = "categoryName")
     @Mapping(source = "image", target = "categoryImage")
     @BeanMapping(ignoreByDefault = true)
-    @Named("adminAutoCompleteMapping")
+    @Named("categoryAutoCompleteMapping")
     CategoryDto fromEntityToAdminDtoAutoComplete(Category category);
 
-    @IterableMapping(elementTargetType = CategoryDto.class, qualifiedByName = "adminAutoCompleteMapping")
+    @IterableMapping(elementTargetType = CategoryDto.class, qualifiedByName = "categoryAutoCompleteMapping")
     List<CategoryDto> fromEntityListToCategoryDtoAutoComplete(List<Category> categories);
 }

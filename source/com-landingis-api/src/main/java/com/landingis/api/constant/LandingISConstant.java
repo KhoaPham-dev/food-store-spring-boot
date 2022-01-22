@@ -34,7 +34,11 @@ public class LandingISConstant {
 
     public static final Integer MIN_PRICE = 0;
 
-    public static final Integer CATEGORY_KIND = 1;
+    public static final Integer CATEGORY_KIND_PRODUCT = 1;
+    public static final Integer CATEGORY_KIND_IMPORT = 2;
+    public static final Integer CATEGORY_KIND_EXPORT = 3;
+    public static final Integer CATEGORY_KIND_NEWS_INTERNAL = 4;
+    public static final Integer CATEGORY_KIND_NEWS_COLLABORATOR = 5;
 
     public static final Integer COLLABORATOR_KIND_PERCENT = 1;
     public static final Integer COLLABORATOR_KIND_DOLLAR = 2;
@@ -65,6 +69,9 @@ public class LandingISConstant {
     public static final Integer ORDERS_STATE_CANCELED = 4;
 
     public static final Integer MIN_OF_AMOUNT = 0;
+
+    public static final Integer IMPORT_KIND = 1;
+    public static final Integer EXPORT_KIND = 2;
 
     public static final Integer PAYMENT_METHOD_COD = 1;
     public static final Integer PAYMENT_METHOD_ONLINE = 2;

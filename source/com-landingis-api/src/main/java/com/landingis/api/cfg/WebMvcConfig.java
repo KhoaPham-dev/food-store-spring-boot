@@ -62,6 +62,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 "/v1/collaborator-product/**",
                 "/v1/orders/**",
                 "/v1/settings/**",
+                "/v1/import-export/**",
         };
         String[] arrayExclude = new String[]{"/v1/home/**"};
         registry.addInterceptor(myIntercepter).addPathPatterns(checkArray).excludePathPatterns(arrayExclude);

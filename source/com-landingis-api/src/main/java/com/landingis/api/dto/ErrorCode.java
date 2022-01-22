@@ -19,6 +19,7 @@ public class ErrorCode {
      */
     public static final String CATEGORY_ERROR_UNAUTHORIZED = "ERROR-CATEGORY-000";
     public static final String CATEGORY_ERROR_NOT_FOUND = "ERROR-CATEGORY-001";
+    public static final String CATEGORY_ERROR_BAD_REQUEST = "ERROR-CATEGORY-002";
 
     /**
      * Group error code
@@ -110,6 +111,14 @@ public class ErrorCode {
     public static final String SETTINGS_ERROR_UNAUTHORIZED = "ERROR-SETTINGS-000";
     public static final String SETTINGS_ERROR_NOT_FOUND = "ERROR-SETTINGS-001";
     public static final String SETTINGS_ERROR_BAD_REQUEST = "ERROR-SETTINGS-002";
+
+    /**
+     * Import Export error code
+     */
+    public static final String IMPORT_EXPORT_ERROR_UNAUTHORIZED = "ERROR-IMPORT_EXPORT-000";
+    public static final String IMPORT_EXPORT_ERROR_NOT_FOUND = "ERROR-IMPORT_EXPORT-001";
+    public static final String IMPORT_EXPORT_ERROR_BAD_REQUEST = "ERROR-IMPORT_EXPORT-002";
+
 
     private ErrorCode() { throw new IllegalStateException("Utility class"); }
 }

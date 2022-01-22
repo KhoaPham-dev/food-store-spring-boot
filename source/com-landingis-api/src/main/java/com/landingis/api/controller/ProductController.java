@@ -10,6 +10,7 @@ import com.landingis.api.dto.product.ProductDto;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.category.CreateCategoryForm;
 import com.landingis.api.form.category.UpdateCategoryForm;
+import com.landingis.api.form.import_export.CreateImportExportForm;
 import com.landingis.api.form.news.CreateNewsForm;
 import com.landingis.api.form.news.UpdateNewsForm;
 import com.landingis.api.form.product.CreateProductForm;
@@ -111,10 +112,7 @@ public class ProductController extends ABasicController{
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
 
         Product product = productMapper.fromCreateProductFormToEntity(createProductForm);
-        Category categoryCheck = categoryRepository.findById(createProductForm.getCategoryId()).orElse(null);
-        if(categoryCheck == null || categoryCheck.getStatus()==0){
-            throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Not found category");
-        }
+        checkCategory(createProductForm);
         if(createProductForm.getParentProductId() != null) {
             Product parentProduct = productRepository.findById(createProductForm.getParentProductId()).orElse(null);
             if(parentProduct == null) {
@@ -128,6 +126,15 @@ public class ProductController extends ABasicController{
         apiMessageDto.setMessage("Create product success");
         return apiMessageDto;
 
+    }
+    private void checkCategory(CreateProductForm createProductForm) {
+        Category categoryCheck = categoryRepository.findById(createProductForm.getCategoryId()).orElse(null);
+        if (categoryCheck == null || categoryCheck.getStatus()==0){
+            throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Category not found");
+        }
+        if(!categoryCheck.getKind().equals(LandingISConstant.CATEGORY_KIND_PRODUCT)){
+            throw new RequestException(ErrorCode.CATEGORY_ERROR_BAD_REQUEST, "Category is not product kind");
+        }
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
