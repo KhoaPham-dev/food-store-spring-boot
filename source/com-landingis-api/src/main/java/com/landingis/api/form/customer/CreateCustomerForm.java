@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 public class CreateCustomerForm {
     @ApiModelProperty(required = true)
+    @NotEmpty(message = "email cannot be null")
     @Email
     private String email;
 
@@ -21,8 +22,6 @@ public class CreateCustomerForm {
     @ApiModelProperty(required = true)
     private String fullName;
 
-    @NotEmpty(message = "password cannot be null")
-    @ApiModelProperty(required = true)
     private String password;
 
     @NotEmpty(message = "phone cannot be null")
@@ -30,6 +29,7 @@ public class CreateCustomerForm {
     private String phone;
 
     @ApiModelProperty(name = "address")
+    @NotEmpty(message = "address cannot be null")
     private String address;
 
     @NotNull(message = "birthDay cannot be null")
@@ -46,4 +46,8 @@ public class CreateCustomerForm {
     @ApiModelProperty(required = true)
     @Status
     private Integer status;
+
+    @NotNull(message = "isAdminCreated cannot be null")
+    @ApiModelProperty(required = true)
+    private boolean isAdminCreated;
 }

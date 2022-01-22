@@ -71,6 +71,12 @@ public interface AccountMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "fullName", target = "fullName")
     @BeanMapping(ignoreByDefault = true)
-    @Named("accountAutoCompleteMapping")
+    @Named("AutoCompleteMapping")
     AccountAdminDto fromEntityToAccountAdminDtoAutoComplete(Account account);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "fullName", target = "fullName")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("accountAutoCompleteMapping")
+    AccountDto fromEntityToAccountDtoAutoComplete(Account account);
 }

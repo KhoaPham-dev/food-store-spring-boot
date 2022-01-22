@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 public class CreateCollaboratorForm {
     @ApiModelProperty(required = true)
+    @NotEmpty(message = "email cannot be null")
     @Email
     private String email;
 

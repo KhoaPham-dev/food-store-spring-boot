@@ -19,6 +19,7 @@ public class CreateCategoryForm {
     private String categoryDescription;
 
     @ApiModelProperty(required = true)
+    @NotEmpty(message = "categoryImage cannot be null")
     private String categoryImage;
 
     @ApiModelProperty(name = "categoryOrdering")

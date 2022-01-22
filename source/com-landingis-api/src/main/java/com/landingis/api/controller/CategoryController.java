@@ -100,6 +100,9 @@ public class CategoryController extends ABasicController{
             if(parentCategory == null || parentCategory.getParentCategory() != null) {
                 throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Not found category parent");
             }
+            if(!parentCategory.getKind().equals(createCategoryForm.getCategoryKind())){
+                throw new RequestException(ErrorCode.CATEGORY_ERROR_BAD_REQUEST, "Kind not same category parent");
+            }
             category.setParentCategory(parentCategory);
         }
         categoryRepository.save(category);

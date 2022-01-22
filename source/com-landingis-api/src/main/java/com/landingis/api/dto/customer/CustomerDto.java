@@ -21,4 +21,5 @@ public class CustomerDto extends ABasicAdminDto {
     private String avatarPath;
     private String fullName;
     private String phone;
+    private boolean isAdminCreated;
 }

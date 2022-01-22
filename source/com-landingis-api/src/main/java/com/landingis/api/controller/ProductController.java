@@ -129,7 +129,7 @@ public class ProductController extends ABasicController{
     }
     private void checkCategory(CreateProductForm createProductForm) {
         Category categoryCheck = categoryRepository.findById(createProductForm.getCategoryId()).orElse(null);
-        if (categoryCheck == null || categoryCheck.getStatus()==0){
+        if (categoryCheck == null || !categoryCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
             throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Category not found");
         }
         if(!categoryCheck.getKind().equals(LandingISConstant.CATEGORY_KIND_PRODUCT)){

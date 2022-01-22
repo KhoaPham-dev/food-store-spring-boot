@@ -109,7 +109,7 @@ public class NewsController extends ABasicController{
     }
     private void checkCategory(CreateNewsForm createNewsForm) {
         Category categoryCheck = categoryRepository.findById(createNewsForm.getCategoryId()).orElse(null);
-        if (categoryCheck == null || categoryCheck.getStatus()==0){
+        if (categoryCheck == null || !categoryCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
             throw new RequestException(ErrorCode.CATEGORY_ERROR_NOT_FOUND, "Category not found");
         }
         if(!categoryCheck.getKind().equals(LandingISConstant.CATEGORY_KIND_NEWS_INTERNAL)){
