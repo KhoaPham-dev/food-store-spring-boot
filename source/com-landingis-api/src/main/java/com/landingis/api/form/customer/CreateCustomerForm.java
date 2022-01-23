@@ -49,5 +49,5 @@ public class CreateCustomerForm {
 
     @NotNull(message = "isAdminCreated cannot be null")
     @ApiModelProperty(required = true)
-    private boolean isAdminCreated;
+    private Boolean isAdminCreated;
 }

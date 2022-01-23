@@ -30,6 +30,6 @@ public class Customer extends Auditable<String>{
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
-    private boolean isAdminCreated = true;
+    private Boolean isAdminCreated = true;
 
 }

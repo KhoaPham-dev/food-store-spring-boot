@@ -24,7 +24,7 @@ public interface CustomerMapper {
     @Mapping(source = "sex", target = "sex")
     @Mapping(source = "note", target = "note")
     @Mapping(source = "status", target = "status")
-    @Mapping(source = "adminCreated", target = "adminCreated")
+    @Mapping(source = "isAdminCreated", target = "isAdminCreated")
     @BeanMapping(ignoreByDefault = true)
     @Named("adminCreateMapping")
     Customer fromCreateCustomerFormToEntity(CreateCustomerForm createCustomerForm);
@@ -50,7 +50,7 @@ public interface CustomerMapper {
     @Mapping(source = "birthday", target = "birthDay")
     @Mapping(source = "note", target = "note")
     @Mapping(source = "status", target = "status")
-    @Mapping(source = "adminCreated", target = "adminCreated")
+    @Mapping(source = "isAdminCreated", target = "isAdminCreated")
     @Mapping(source = "modifiedDate", target = "modifiedDate")
     @Mapping(source = "createdDate", target = "createdDate")
     @Mapping(source = "modifiedBy", target = "modifiedBy")
