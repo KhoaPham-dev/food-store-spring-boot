@@ -6,6 +6,7 @@ import com.landingis.api.dto.ErrorCode;
 import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.dto.orders.OrdersDetailDto;
 import com.landingis.api.dto.orders.OrdersDto;
+import com.landingis.api.dto.orders.ResponseListObjOrders;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.orders.CreateOrdersForm;
 import com.landingis.api.form.orders.DeleteOrdersDetailForm;
@@ -86,6 +87,39 @@ public class OrdersController extends ABasicController{
         responseListObj.setTotalElements(listOrders.getTotalElements());
 
         responseListObjApiMessageDto.setData(responseListObj);
+        responseListObjApiMessageDto.setMessage("Get list success");
+        return responseListObjApiMessageDto;
+    }
+
+    @GetMapping(value = "/my-orders",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<ResponseListObjOrders> listMyOrders(OrdersCriteria ordersCriteria, Pageable pageable){
+        if(!isAdmin() && !isCollaborator() && !isEmployee()){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED,"Not allowed get list.");
+        }
+        if(!isAdmin()){
+            Long currentUserId = getCurrentUserId();
+            Account accountCheck = accountRepository.findById(currentUserId).orElse(null);
+            ordersCriteria.setAccountId(accountCheck.getId());
+        }
+        ApiMessageDto<ResponseListObjOrders> responseListObjApiMessageDto = new ApiMessageDto<>();
+        Page<Orders> listOrders = ordersRepository.findAll(ordersCriteria.getSpecification(), pageable);
+        ResponseListObjOrders responseListObjOrders = new ResponseListObjOrders();
+        responseListObjOrders.setData(ordersMapper.fromEntityListToOrdersDtoList(listOrders.getContent()));
+        responseListObjOrders.setPage(pageable.getPageNumber());
+        responseListObjOrders.setTotalPage(listOrders.getTotalPages());
+        responseListObjOrders.setTotalElements(listOrders.getTotalElements());
+        Double sum = 0d;
+        if(isAdmin()){
+            sum = ordersRepository.sumMoney();
+        }
+        if(isCollaborator()){
+            sum = ordersRepository.sumMoneyByCollaboratorAccountId(getCurrentUserId());
+        }
+        if(isEmployee()){
+            sum = ordersRepository.sumMoneyByEmployeeAccountId(getCurrentUserId());
+        }
+        responseListObjOrders.setSumMoney(sum);
+        responseListObjApiMessageDto.setData(responseListObjOrders);
         responseListObjApiMessageDto.setMessage("Get list success");
         return responseListObjApiMessageDto;
     }
@@ -229,6 +263,7 @@ public class OrdersController extends ABasicController{
             Customer savedCustomer = new Customer();
             savedCustomer.setAccount(savedAccount);
             savedCustomer.setAddress(createOrdersForm.getAddress());
+            savedCustomer.setIsAdminCreated(true);
             savedCustomer = customerRepository.save(savedCustomer);
             orders.setCustomer(savedCustomer);
         }

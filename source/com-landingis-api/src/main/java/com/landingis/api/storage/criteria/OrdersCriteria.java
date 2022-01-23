@@ -17,6 +17,7 @@ public class OrdersCriteria {
     private String code;
     private Integer paymentMethod;
     private Integer status;
+    private Long accountId;
 
     public Specification<Orders> getSpecification() {
         return new Specification<Orders>() {
@@ -40,6 +41,10 @@ public class OrdersCriteria {
                 if(getCustomerId() != null) {
                     Join<Customer, Orders> joinCustomer = root.join("customer", JoinType.INNER);
                     predicates.add(cb.equal(cb.lower(joinCustomer.get("id")), getCustomerId()));
+                }
+                if(getAccountId() != null) {
+                    Join<Account, Orders> joinAccount = root.join("account", JoinType.INNER);
+                    predicates.add(cb.equal(cb.lower(joinAccount.get("id")), getAccountId()));
                 }
                 if(getCollaboratorId() != null) {
                     Join<Collaborator, Orders> joinCollaborator = root.join("collaborator", JoinType.INNER);
