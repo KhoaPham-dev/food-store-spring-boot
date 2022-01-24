@@ -111,6 +111,7 @@ public class CollaboratorController extends ABasicController{
             throw new RequestException(ErrorCode.GROUP_ERROR_NOT_FOUND, "Group does not exist!");
         }
         Collaborator collaborator = collaboratorMapper.fromCreateCollaboratorFormToEntity(createCollaboratorForm);
+        collaborator.setEmployee(employee);
         collaborator.getAccount().setGroup(group);
         collaborator.getAccount().setKind(LandingISConstant.USER_KIND_COLLABORATOR);
         collaborator.getAccount().setPassword(passwordEncoder.encode(createCollaboratorForm.getPassword()));

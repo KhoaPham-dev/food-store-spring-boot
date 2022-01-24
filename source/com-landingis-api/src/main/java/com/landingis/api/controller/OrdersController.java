@@ -168,6 +168,12 @@ public class OrdersController extends ABasicController{
         if(collaboratorCheck == null){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"Must have collaborator id");
         }
+        if(isEmployee()){
+            Employee employeeCheck = employeeRepository.findByAccountId(getCurrentUserId());
+            if(!collaboratorCheck.getEmployee().getId().equals(employeeCheck.getId())){
+                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"Employee not have this collaborator ");
+            }
+        }
         ApiMessageDto<ResponseListObj<OrdersCollaborator>> responseListObjApiMessageDto = new ApiMessageDto<>();
         Page<OrdersCollaborator> listCollaboratorOrders = ordersRepository.getOrdersCollaboratorList(ordersCriteria.getFrom(),ordersCriteria.getTo(),ordersCriteria.getState(),ordersCriteria.getCollaboratorId(),pageable);
         ResponseListObj<OrdersCollaborator> responseListObj = new ResponseListObj<>();
