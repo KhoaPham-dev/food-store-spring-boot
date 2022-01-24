@@ -34,11 +34,7 @@ public class UpdateOrdersForm {
     @ApiModelProperty(required = true)
     private Integer status;
 
-    /*@NotEmpty(message = "updateOrdersDetailFormList cannot be empty")
-    @ApiModelProperty(required = true)*/
     private List<@Valid UpdateOrdersDetailForm> updateOrdersDetailFormList;
 
-    /*@NotEmpty(message = "deleteOrdersDetailFormList cannot be empty")
-    @ApiModelProperty(required = true)*/
     private List<@Valid DeleteOrdersDetailForm> deleteOrdersDetailFormList;
 }

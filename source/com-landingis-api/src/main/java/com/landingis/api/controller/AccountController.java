@@ -107,6 +107,7 @@ public class AccountController extends ABasicController{
         securityContext.setAuthentication(new MyAuthentication(qrJwt));
 
 
+
         log.info("jwt user ne: {}", qrJwt);
         String token = JWTUtils.createJWT(JWTUtils.ALGORITHMS_HMAC, "authenticationToken.getId().toString()", qrJwt, DateUtils.convertToDateViaInstant(parsedDate));
         LoginDto loginDto = new LoginDto();
@@ -126,9 +127,12 @@ public class AccountController extends ABasicController{
 
     private String getAppendStringRole (Account account) {
         String appendStringRole = "";
-        if(Objects.equals(account.getKind(), LandingISConstant.USER_KIND_ADMIN)){
+        if(Objects.equals(account.getKind(), LandingISConstant.USER_KIND_ADMIN)
+            || Objects.equals(account.getKind(), LandingISConstant.USER_KIND_EMPLOYEE)
+            || Objects.equals(account.getKind(), LandingISConstant.USER_KIND_COLLABORATOR)){
             appendStringRole = "/account/profile,/account/update_profile,/account/logout";
-        } else {
+        }
+        else {
             throw new RequestException(ErrorCode.GENERAL_ERROR_UNAUTHORIZED);
         }
         return appendStringRole;

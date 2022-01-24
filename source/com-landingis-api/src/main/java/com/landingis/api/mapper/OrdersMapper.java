@@ -21,8 +21,6 @@ import java.util.List;
         uses = {CustomerMapper.class,CollaboratorMapper.class,EmployeeMapper.class})
 public interface OrdersMapper {
     @Mapping(source = "saleOff", target = "saleOff")
-    @Mapping(source = "state", target = "state")
-    @Mapping(source = "prevState", target = "prevState")
     @Mapping(source = "address", target = "address")
     @Mapping(source = "receiverName", target = "receiverName")
     @Mapping(source = "paymentMethod", target = "paymentMethod")

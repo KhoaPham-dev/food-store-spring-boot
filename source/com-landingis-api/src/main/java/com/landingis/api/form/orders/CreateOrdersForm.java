@@ -20,14 +20,6 @@ public class CreateOrdersForm {
     @ApiModelProperty(required = true)
     private Integer saleOff;
 
-    @OrdersState
-    @NotNull(message = "state cannot be null")
-    @ApiModelProperty(required = true)
-    private Integer state;
-
-    @OrdersState
-    private Integer prevState;
-
     @NotEmpty(message = "address cannot be empty")
     @ApiModelProperty(required = true)
     private String address;

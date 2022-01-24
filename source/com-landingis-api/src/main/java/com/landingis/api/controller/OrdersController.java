@@ -96,10 +96,24 @@ public class OrdersController extends ABasicController{
         if(!isAdmin() && !isCollaborator() && !isEmployee()){
             throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED,"Not allowed get list.");
         }
-        if(!isAdmin()){
-            Long currentUserId = getCurrentUserId();
-            Account accountCheck = accountRepository.findById(currentUserId).orElse(null);
-            ordersCriteria.setAccountId(accountCheck.getId());
+        Long currentUserId = getCurrentUserId();
+        Account accountCheck = accountRepository.findById(currentUserId).orElse(null);
+        if(accountCheck == null || !accountCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"account is not exist");
+        }
+        if(isEmployee()){
+            Employee employeeCheck = employeeRepository.findByAccountId(accountCheck.getId());
+            if(employeeCheck == null || !employeeCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"employee is not exist");
+            }
+            ordersCriteria.setEmployeeId(employeeCheck.getId());
+        }
+        else if(isCollaborator()){
+            Collaborator collaboratorCheck = collaboratorRepository.findByAccountId(accountCheck.getId());
+            if(collaboratorCheck == null || !collaboratorCheck.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+                throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"collaborator is not exist");
+            }
+            ordersCriteria.setCollaboratorId(collaboratorCheck.getId());
         }
         ApiMessageDto<ResponseListObjOrders> responseListObjApiMessageDto = new ApiMessageDto<>();
         Page<Orders> listOrders = ordersRepository.findAll(ordersCriteria.getSpecification(), pageable);
@@ -147,7 +161,7 @@ public class OrdersController extends ABasicController{
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public ApiMessageDto<String> create(@Valid @RequestBody CreateOrdersForm createOrdersForm, BindingResult bindingResult) {
-        if(!isAdmin()){
+        if(!isAdmin() && !isCollaborator() && !isEmployee()){
             throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED, "Not allowed to create.");
         }
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
@@ -159,11 +173,12 @@ public class OrdersController extends ABasicController{
         if((checkSaleOff < LandingISConstant.MIN_OF_PERCENT) || (checkSaleOff > LandingISConstant.MAX_OF_PERCENT)){
             throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST, "saleOff is not accepted");
         }
-        Long checkAccount = getCurrentUserId();
-        Employee checkEmployee = employeeRepository.findById(checkAccount).orElse(null);
-        Collaborator checkCollaborator= collaboratorRepository.findById(checkAccount).orElse(null);
+        Long checkAccountId = getCurrentUserId();
+        Employee checkEmployee = employeeRepository.findByAccountId(checkAccountId);
+        Collaborator checkCollaborator= collaboratorRepository.findByAccountId(checkAccountId);
         validateCollaboratorAndEmployee(checkCollaborator,checkEmployee, ordersDetailList,orders);
         orders.setCode(generateCode());
+        orders.setState(LandingISConstant.ORDERS_STATE_CREATED);
         Orders savedOrder = ordersRepository.save(orders);
         /*-----------------------Xử lý orders detail------------------ */
         amountPriceCal(orders,ordersDetailList,checkCollaborator,savedOrder);  //Tổng tiền hóa đơn

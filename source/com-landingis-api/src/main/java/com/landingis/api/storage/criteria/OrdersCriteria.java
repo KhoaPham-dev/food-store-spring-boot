@@ -13,11 +13,11 @@ public class OrdersCriteria {
     private Long id;
     private Long customerId;
     private Long collaboratorId;
+    private Long employeeId;
     private Integer state;
     private String code;
     private Integer paymentMethod;
     private Integer status;
-    private Long accountId;
 
     public Specification<Orders> getSpecification() {
         return new Specification<Orders>() {
@@ -40,15 +40,15 @@ public class OrdersCriteria {
                 }
                 if(getCustomerId() != null) {
                     Join<Customer, Orders> joinCustomer = root.join("customer", JoinType.INNER);
-                    predicates.add(cb.equal(cb.lower(joinCustomer.get("id")), getCustomerId()));
-                }
-                if(getAccountId() != null) {
-                    Join<Account, Orders> joinAccount = root.join("account", JoinType.INNER);
-                    predicates.add(cb.equal(cb.lower(joinAccount.get("id")), getAccountId()));
+                    predicates.add(cb.equal(joinCustomer.get("id"), getCustomerId()));
                 }
                 if(getCollaboratorId() != null) {
                     Join<Collaborator, Orders> joinCollaborator = root.join("collaborator", JoinType.INNER);
-                    predicates.add(cb.equal(cb.lower(joinCollaborator.get("id")), getCollaboratorId()));
+                    predicates.add(cb.equal(joinCollaborator.get("id"), getCollaboratorId()));
+                }
+                if(getEmployeeId() != null) {
+                    Join<Employee, Orders> joinEmployee = root.join("employee", JoinType.INNER);
+                    predicates.add(cb.equal(joinEmployee.get("id"), getEmployeeId()));
                 }
                 if(getCode() != null) {
                     predicates.add(cb.like(cb.lower(root.get("code")), "%" + getCode().toLowerCase() + "%"));

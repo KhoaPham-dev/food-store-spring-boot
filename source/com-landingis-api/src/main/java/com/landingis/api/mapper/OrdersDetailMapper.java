@@ -35,14 +35,6 @@ public interface OrdersDetailMapper {
     @IterableMapping(elementTargetType = OrdersDetail.class, qualifiedByName = "adminUpdateMapping")
     List<OrdersDetail> fromUpdateOrdersDetailFormListToOrdersDetailList(List<UpdateOrdersDetailForm> updateOrdersDetailFormList);
 
-    /*@Mapping(source = "productId", target = "product.id")
-    @BeanMapping(ignoreByDefault = true)
-    @Named("adminDeleteMapping")
-    OrdersDetail fromDeleteOrdersDetailFormToEntity(DeleteOrdersDetailForm deleteOrdersDetailForm);
-
-    @IterableMapping(elementTargetType = OrdersDetail.class, qualifiedByName = "adminDeleteMapping")
-    List<OrdersDetail> fromDeleteOrdersDetailFormListToOrdersDetailList(List<DeleteOrdersDetailForm> deleteOrdersDetailFormList);
-*/
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "orders", target = "ordersDto",qualifiedByName = "ordersAutoCompleteMapping")
