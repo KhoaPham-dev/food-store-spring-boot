@@ -42,7 +42,7 @@ public class ImportExportCriteria {
                 }
                 if(getCategoryKind() != null) {
                     Join<Category, ImportExport> joinCategory = root.join("category", JoinType.INNER);
-                    predicates.add(cb.equal(joinCategory.get("kind")), getCategoryKind());
+                    predicates.add(cb.equal(joinCategory.get("kind"), getCategoryKind()));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }

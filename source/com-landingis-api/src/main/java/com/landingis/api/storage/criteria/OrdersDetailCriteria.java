@@ -34,11 +34,11 @@ public class OrdersDetailCriteria {
                 }
                 if(getOrdersId() != null) {
                     Join<Orders, OrdersDetail> joinOrders = root.join("orders", JoinType.INNER);
-                    predicates.add(cb.equal(joinOrders.get("id")), getOrdersId());
+                    predicates.add(cb.equal(joinOrders.get("id"),getOrdersId()));
                 }
                 if(getProductId() != null) {
                     Join<Product, OrdersDetail> joinProduct = root.join("product", JoinType.INNER);
-                    predicates.add(cb.equal(joinProduct.get("id")), getProductId());
+                    predicates.add(cb.equal(joinProduct.get("id"), getProductId()));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }

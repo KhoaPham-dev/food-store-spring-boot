@@ -30,11 +30,11 @@ public class CollaboratorProductCriteria {
                 }
                 if(getCollaboratorId() != null) {
                     Join<Collaborator, CollaboratorProduct> joinCollaborator = root.join("collaborator", JoinType.INNER);
-                    predicates.add(cb.equal(joinCollaborator.get("id")), getCollaboratorId());
+                    predicates.add(cb.equal(joinCollaborator.get("id"), getCollaboratorId()));
                 }
                 if(getProductId() != null) {
                     Join<Product, CollaboratorProduct> joinProduct= root.join("product", JoinType.INNER);
-                    predicates.add(cb.equal(joinProduct.get("id")), getProductId());
+                    predicates.add(cb.equal(joinProduct.get("id"), getProductId()));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }

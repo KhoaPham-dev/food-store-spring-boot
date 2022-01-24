@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -18,6 +19,8 @@ public class OrdersCriteria {
     private String code;
     private Integer paymentMethod;
     private Integer status;
+    private Date from;
+    private Date to;
 
     public Specification<Orders> getSpecification() {
         return new Specification<Orders>() {
@@ -52,6 +55,12 @@ public class OrdersCriteria {
                 }
                 if(getCode() != null) {
                     predicates.add(cb.like(cb.lower(root.get("code")), "%" + getCode().toLowerCase() + "%"));
+                }
+                if(getFrom() != null){
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createdDate"), getFrom()));
+                }
+                if(getTo() != null){
+                    predicates.add(cb.lessThanOrEqualTo(root.get("createdDate"), getTo()));
                 }
                 return cb.and(predicates.toArray(new Predicate[predicates.size()]));
             }

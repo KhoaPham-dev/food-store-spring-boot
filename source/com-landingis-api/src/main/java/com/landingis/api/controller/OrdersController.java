@@ -17,11 +17,11 @@ import com.landingis.api.mapper.OrdersMapper;
 import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.OrdersCriteria;
 import com.landingis.api.storage.model.*;
+import com.landingis.api.storage.projection.OrdersCollaborator;
 import com.landingis.api.storage.repository.*;
 import com.landingis.api.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -32,6 +32,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -156,6 +157,28 @@ public class OrdersController extends ABasicController{
         result.setData(ordersDto);
         result.setMessage("Get orders success");
         return result;
+    }
+
+    @GetMapping(value = "/collaborator-orders-list",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<ResponseListObj<OrdersCollaborator>> collaboratorOrdersList(OrdersCriteria ordersCriteria, Pageable pageable){
+        if(!isAdmin() && !isEmployee()){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_UNAUTHORIZED,"Not allowed get list.");
+        }
+        Collaborator collaboratorCheck = collaboratorRepository.findById(ordersCriteria.getCollaboratorId()).orElse(null);
+        if(collaboratorCheck == null){
+            throw new RequestException(ErrorCode.ORDERS_ERROR_BAD_REQUEST,"Must have collaborator id");
+        }
+        ApiMessageDto<ResponseListObj<OrdersCollaborator>> responseListObjApiMessageDto = new ApiMessageDto<>();
+        Page<OrdersCollaborator> listCollaboratorOrders = ordersRepository.getOrdersCollaboratorList(ordersCriteria.getFrom(),ordersCriteria.getTo(),ordersCriteria.getState(),ordersCriteria.getCollaboratorId(),pageable);
+        ResponseListObj<OrdersCollaborator> responseListObj = new ResponseListObj<>();
+        responseListObj.setData(listCollaboratorOrders.getContent());
+        responseListObj.setPage(pageable.getPageNumber());
+        responseListObj.setTotalPage(listCollaboratorOrders.getTotalPages());
+        responseListObj.setTotalElements(listCollaboratorOrders.getTotalElements());
+
+        responseListObjApiMessageDto.setData(responseListObj);
+        responseListObjApiMessageDto.setMessage("Get list success");
+        return responseListObjApiMessageDto;
     }
 
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)

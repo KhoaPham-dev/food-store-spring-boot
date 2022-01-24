@@ -36,7 +36,7 @@ public class CollaboratorCriteria {
                 }
                 if(getEmployeeId() != null) {
                     Join<Employee, Collaborator> joinEmployee = root.join("employee", JoinType.INNER);
-                    predicates.add(cb.equal(joinEmployee.get("id")), getEmployeeId());
+                    predicates.add(cb.equal(joinEmployee.get("id"), getEmployeeId()));
                 }
                 if(getPhone() != null) {
                     Join<Account, Collaborator> joinAccount = root.join("account", JoinType.INNER);
