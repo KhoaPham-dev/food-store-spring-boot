@@ -82,6 +82,23 @@ public class SettingsController extends ABasicController{
         return result;
     }
 
+    @GetMapping(value = "/client-list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<ResponseListObj<SettingsDto>> clientList(SettingsCriteria settingsCriteria, Pageable pageable) {
+        ApiMessageDto<ResponseListObj<SettingsDto>> responseListObjApiMessageDto = new ApiMessageDto<>();
+        settingsCriteria.setGroupId(LandingISConstant.SETTING_GROUP_ID_CUSTOMER);
+        Page<Settings> listSettings= settingsRepository.findAll(settingsCriteria.getSpecification(), pageable);
+        ResponseListObj<SettingsDto> responseListObj = new ResponseListObj<>();
+        responseListObj.setData(settingsMapper.fromEntityListToClientSettingsDtoList(listSettings.getContent()));
+        responseListObj.setPage(pageable.getPageNumber());
+        responseListObj.setTotalPage(listSettings.getTotalPages());
+        responseListObj.setTotalElements(listSettings.getTotalElements());
+
+        responseListObjApiMessageDto.setData(responseListObj);
+        responseListObjApiMessageDto.setMessage("Get list success");
+        return responseListObjApiMessageDto;
+    }
+
+
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiMessageDto<String> create(@Valid @RequestBody CreateSettingsForm createSettingsForm, BindingResult bindingResult) {
         if(!isAdmin()){

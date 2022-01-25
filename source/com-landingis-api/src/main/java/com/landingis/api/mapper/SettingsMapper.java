@@ -57,5 +57,15 @@ public interface SettingsMapper {
     List<SettingsDto> fromEntityListToSettingsDtoList(List<Settings> settingsList);
 
 
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "value", target = "value")
+    @Mapping(source = "key", target = "key")
+    @Mapping(source = "group", target = "group")
+    @Mapping(source = "kind", target = "kind")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("clientGetMapping")
+    SettingsDto fromEntityToClientDto(Settings settings);
 
+    @IterableMapping(elementTargetType = SettingsDto.class, qualifiedByName = "clientGetMapping")
+    List<SettingsDto> fromEntityListToClientSettingsDtoList(List<Settings> settingsList);
 }
