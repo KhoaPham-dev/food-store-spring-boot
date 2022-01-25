@@ -57,6 +57,7 @@ public class ErrorCode {
      */
     public static final String EMPLOYEE_ERROR_UNAUTHORIZED = "ERROR-EMPLOYEE-000";
     public static final String EMPLOYEE_ERROR_NOT_FOUND = "ERROR-EMPLOYEE-001";
+    public static final String EMPLOYEE_ERROR_BAD_REQUEST = "ERROR-EMPLOYEE-002";
 
     /**
      * Province error code
@@ -83,6 +84,7 @@ public class ErrorCode {
      */
     public static final String COLLABORATOR_ERROR_UNAUTHORIZED = "ERROR-COLLABORATOR-000";
     public static final String COLLABORATOR_ERROR_NOT_FOUND = "ERROR-COLLABORATOR-001";
+    public static final String COLLABORATOR_ERROR_BAD_REQUEST = "ERROR-COLLABORATOR-002";
 
     /**
      * Collaborator-Product error code

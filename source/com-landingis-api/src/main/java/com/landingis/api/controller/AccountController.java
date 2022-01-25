@@ -343,7 +343,6 @@ public class AccountController extends ABasicController{
 
             throw new RequestException(ErrorCode.GENERAL_ERROR_INVALID, "Code invalid");
         }
-
         account.setResetPwdTime(null);
         account.setResetPwdCode(null);
         account.setAttemptCode(null);

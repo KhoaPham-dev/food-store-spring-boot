@@ -2,8 +2,10 @@ package com.landingis.api.mapper;
 
 import java.util.List;
 
+import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.dto.group.GroupAdminDto;
 import com.landingis.api.dto.group.GroupDto;
+import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.Group;
 
 import org.mapstruct.*;
@@ -32,4 +34,15 @@ public interface GroupMapper {
 
     @IterableMapping(elementTargetType = GroupDto.class)
     List<GroupDto> fromEntityListToDtoList(List<Group> content);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "permissions", target = "permissions")
+    @Mapping(source = "kind", target = "kind")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("groupAutoCompleteMapping")
+    GroupDto fromEntityToAdminDtoAutoComplete(Group group);
+
+    @IterableMapping(elementTargetType = GroupDto.class, qualifiedByName = "groupAutoCompleteMapping")
+    List<GroupDto> fromEntityListToGroupDtoAutoComplete(List<Group> groupList);
+
 }

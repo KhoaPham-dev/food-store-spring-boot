@@ -9,6 +9,7 @@ import com.landingis.api.dto.ResponseListObj;
 import com.landingis.api.exception.RequestException;
 import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
+import com.landingis.api.form.collaborator.UpdateCollaboratorProfileForm;
 import com.landingis.api.mapper.CollaboratorMapper;
 import com.landingis.api.service.LandingIsApiService;
 import com.landingis.api.storage.criteria.CollaboratorCriteria;
@@ -89,6 +90,21 @@ public class CollaboratorController extends ABasicController{
         result.setMessage("Get collaborator success");
         return result;
     }
+    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<CollaboratorDto> getProfile() {
+        if(!isCollaborator()){
+            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_UNAUTHORIZED, "Not allowed get.");
+        }
+        ApiMessageDto<CollaboratorDto> result = new ApiMessageDto<>();
+        Long id = getCurrentUserId();
+        Collaborator collaborator = collaboratorRepository.findByAccountId(id);
+        if(collaborator == null || !collaborator.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "Not found collaborator.");
+        }
+        result.setData(collaboratorMapper.fromEntityToCollaboratorProfileDto(collaborator));
+        result.setMessage("Get collaborator success");
+        return result;
+    }
 
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiMessageDto<String> create(@Valid @RequestBody CreateCollaboratorForm createCollaboratorForm, BindingResult bindingResult) {
@@ -142,6 +158,33 @@ public class CollaboratorController extends ABasicController{
                 landingIsApiService.deleteFile(collaborator.getAccount().getAvatarPath());
             }
             collaborator.getAccount().setAvatarPath(updateCollaboratorForm.getAvatarPath());
+        }
+        collaboratorRepository.save(collaborator);
+        apiMessageDto.setMessage("Update collaborator success");
+        return apiMessageDto;
+    }
+
+    @PutMapping(value = "/update-profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiMessageDto<String> updateProfile(@Valid @RequestBody UpdateCollaboratorProfileForm updateCollaboratorForm, BindingResult bindingResult) {
+        if(!isCollaborator()){
+            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_UNAUTHORIZED, "Not allowed to update.");
+        }
+        ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
+        Long id = getCurrentUserId();
+        Collaborator collaborator = collaboratorRepository.findByAccountId(id);
+        if(collaborator == null || !collaborator.getStatus().equals(LandingISConstant.STATUS_ACTIVE)){
+            throw new RequestException(ErrorCode.COLLABORATOR_ERROR_NOT_FOUND, "Not found collaborator.");
+        }
+        if (StringUtils.isNoneBlank(updateCollaboratorForm.getCollaboratorOldPassword())) {
+            if(!passwordEncoder.matches(updateCollaboratorForm.getCollaboratorOldPassword(), collaborator.getAccount().getPassword())){
+                throw new RequestException(ErrorCode.COLLABORATOR_ERROR_BAD_REQUEST, "Old password is wrong.");
+            }
+        }
+        if (StringUtils.isNoneBlank(updateCollaboratorForm.getCollaboratorNewPassword())) {
+            if(passwordEncoder.matches(updateCollaboratorForm.getCollaboratorNewPassword(), collaborator.getAccount().getPassword())){
+                throw new RequestException(ErrorCode.COLLABORATOR_ERROR_BAD_REQUEST, "New password is already in use.");
+            }
+            collaborator.getAccount().setPassword(passwordEncoder.encode(updateCollaboratorForm.getCollaboratorNewPassword()));
         }
         collaboratorRepository.save(collaborator);
         apiMessageDto.setMessage("Update collaborator success");

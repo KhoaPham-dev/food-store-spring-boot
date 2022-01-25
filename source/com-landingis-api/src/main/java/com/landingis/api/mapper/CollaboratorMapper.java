@@ -1,10 +1,9 @@
 package com.landingis.api.mapper;
 
-import com.landingis.api.dto.category.CategoryDto;
 import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.form.collaborator.CreateCollaboratorForm;
 import com.landingis.api.form.collaborator.UpdateCollaboratorForm;
-import com.landingis.api.storage.model.Category;
+import com.landingis.api.form.collaborator.UpdateCollaboratorProfileForm;
 import com.landingis.api.storage.model.Collaborator;
 import org.mapstruct.*;
 
@@ -52,6 +51,7 @@ public interface CollaboratorMapper {
     @Named("adminUpdateMapping")
     void fromUpdateCollaboratorFormToEntity(UpdateCollaboratorForm updateCollaboratorForm, @MappingTarget Collaborator collaborator);
 
+
     @Mapping(source = "account.username", target = "username")
     @Mapping(source = "account.kind", target = "kind")
     @Mapping(source = "account.email", target = "email")
@@ -80,6 +80,30 @@ public interface CollaboratorMapper {
 
     @IterableMapping(elementTargetType = CollaboratorDto.class, qualifiedByName = "adminGetMapping")
     List<CollaboratorDto> fromEntityListToCollaboratorDtoList(List<Collaborator> collaborators);
+
+
+    @Mapping(source = "account.username", target = "username")
+    @Mapping(source = "account.kind", target = "kind")
+    @Mapping(source = "account.email", target = "email")
+    @Mapping(source = "account.avatarPath", target = "avatarPath")
+    @Mapping(source = "account.fullName", target = "fullName")
+    @Mapping(source = "account.phone", target = "phone")
+    @Mapping(source = "identityNumber", target = "identityNumber")
+    @Mapping(source = "dateOfIssue", target = "dateOfIssue")
+    @Mapping(source = "placeOfIssue", target = "placeOfIssue")
+    @Mapping(source = "bankNo", target = "bankNo")
+    @Mapping(source = "bankName", target = "bankName")
+    @Mapping(source = "branchName", target = "branchName")
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "address", target = "address")
+    @Mapping(source = "birthday", target = "birthDay")
+    @Mapping(source = "sex", target = "sex")
+    @Mapping(source = "account.group", target = "groupDto" ,qualifiedByName = "groupAutoCompleteMapping")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("clientGetMapping")
+    CollaboratorDto fromEntityToCollaboratorProfileDto(Collaborator collaborator);
+
+
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "account.fullName", target = "fullName")

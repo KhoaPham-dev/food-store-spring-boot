@@ -1,10 +1,12 @@
 package com.landingis.api.mapper;
 
+import com.landingis.api.dto.collaborator.CollaboratorDto;
 import com.landingis.api.dto.customer.CustomerDto;
 import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.dto.employee.EmployeeDto;
 import com.landingis.api.form.employee.CreateEmployeeForm;
 import com.landingis.api.form.employee.UpdateEmployeeForm;
+import com.landingis.api.storage.model.Collaborator;
 import com.landingis.api.storage.model.Customer;
 import com.landingis.api.storage.model.Employee;
 import org.mapstruct.*;
@@ -86,6 +88,27 @@ public interface EmployeeMapper {
 
     @IterableMapping(elementTargetType = EmployeeDto.class, qualifiedByName = "adminGetMapping")
     List<EmployeeDto> fromEntityListToEmployeeDtoList(List<Employee> employees);
+
+    @Mapping(source = "account.username", target = "username")
+    @Mapping(source = "account.kind", target = "kind")
+    @Mapping(source = "account.email", target = "email")
+    @Mapping(source = "account.avatarPath", target = "avatarPath")
+    @Mapping(source = "account.fullName", target = "fullName")
+    @Mapping(source = "account.phone", target = "phone")
+    @Mapping(source = "identityNumber", target = "identityNumber")
+    @Mapping(source = "dateOfIssue", target = "dateOfIssue")
+    @Mapping(source = "placeOfIssue", target = "placeOfIssue")
+    @Mapping(source = "bankNo", target = "bankNo")
+    @Mapping(source = "bankName", target = "bankName")
+    @Mapping(source = "branchName", target = "branchName")
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "address", target = "address")
+    @Mapping(source = "birthday", target = "birthDay")
+    @Mapping(source = "sex", target = "sex")
+    @Mapping(source = "account.group", target = "groupDto" ,qualifiedByName = "groupAutoCompleteMapping")
+    @BeanMapping(ignoreByDefault = true)
+    @Named("clientGetMapping")
+    EmployeeDto fromEntityToEmployeeProfileDto(Employee employee);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "account", target = "accountDto",qualifiedByName="accountAutoCompleteMapping")
