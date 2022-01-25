@@ -130,7 +130,9 @@ public class CollaboratorController extends ABasicController{
         collaborator.setEmployee(employee);
         collaborator.getAccount().setGroup(group);
         collaborator.getAccount().setKind(LandingISConstant.USER_KIND_COLLABORATOR);
-        collaborator.getAccount().setPassword(passwordEncoder.encode(createCollaboratorForm.getPassword()));
+        if(StringUtils.isNoneBlank(createCollaboratorForm.getPassword())){
+            collaborator.getAccount().setPassword(passwordEncoder.encode(createCollaboratorForm.getPassword()));
+        }
         collaboratorRepository.save(collaborator);
         apiMessageDto.setMessage("Create collaborator success");
         return apiMessageDto;
